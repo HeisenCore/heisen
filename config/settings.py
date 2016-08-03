@@ -5,9 +5,13 @@ from json import loads
 
 import pytz
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 LOCAL_TZ = pytz.timezone('Asia/Tehran')
+RPC_PORT = 7080
+
+BACKGROUND_PROCESS_THREAD_POOL = 120
+MAIN_MIN_THREAD = 30
+MAIN_MAX_THREAD = 80
 
 # Scheduler & CronJob
 AP_THREADPOOL_EXECUTOR = 20
@@ -65,6 +69,7 @@ installed_component = [
     "resource",
     "pa"
 ]
+
 
 
 try:

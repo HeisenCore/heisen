@@ -1,17 +1,13 @@
-# python import
 import imp
 import os
 import sys
 import types
 
-
-# Core Services import
 from core import logException
 from core import toLog
 
 
 class PluginLoader:
-
     def initPluginsAndRegister(self, directory, mapping):
         """
             Load all plugins in directory and try to register plugin
@@ -51,8 +47,7 @@ class PluginLoader:
             it in attribute factory attribute classes are inherited
             from attributNe parents available in mapping
         """
-        toLog('RegisterModuleAttributes: processing module: %s' % module,
-              'service')
+        toLog('RegisterModuleAttributes: processing module: %s' % module, 'service')
 
         for obj_name in dir(module):
             obj = getattr(module, obj_name)
@@ -60,10 +55,9 @@ class PluginLoader:
             if self.__isClass(obj):
 
                 for klass in mapping:
-                    toLog('RegisterModuleAttributes: '
-                          'obj = %s klass: %s subclass = %s'
-                          % (obj, klass, issubclass(obj, klass)),
-                          'service')
+                    toLog('RegisterModuleAttributes: obj = %s klass: %s subclass = %s' % (
+                        obj, klass, issubclass(obj, klass)
+                    ), 'service')
 
                     if issubclass(obj, klass) and obj != klass:
                         mapping[klass](obj)
@@ -76,12 +70,9 @@ class PluginLoader:
             call init function of all modules in "modules" dict
         """
         for obj in modules.itervalues():
-
             try:
-
                 if hasattr(obj, 'init'):
                     obj.init()
-
             except:
                 toLog('PluginLoader.__callInits', 'error')
 
@@ -95,29 +86,29 @@ class PluginLoader:
             file = None
             try:
                 module_name = file_name[:-3]              # remove trailing.py
-                (file, pathname, desc) = imp.find_module(module_name,
-                                                         [directory])
-                modules[module_name] = imp.load_module(module_name,
-                                                       file, pathname,
-                                                       desc)
+                file, pathname, desc = imp.find_module(module_name, [directory])
+                modules[module_name] = imp.load_module(module_name, file, pathname, desc)
             except Exception as e:
                 if file is not None:
                     file.close()
                 logException('LoadModulesError: PluginLoader.__loadModules: ' '%s' % e)
+
         return modules
 
     def __getPyFiles(self, directory):
         """
             return list of all .py files in directory
         """
-        return filter(lambda name: name.endswith('.py') or name.endswith('.so'),
-                      self.__getFilesList(directory))
+        return filter(
+            lambda name: name.endswith('.py') or name.endswith('.so'),
+            self.__getFilesList(directory)
+        )
 
     def __getFilesList(self, directory):
         """
             return list of all files in "directory"
         """
-        # TODO:get directory which running
+
         try:
             return os.listdir(directory)
 

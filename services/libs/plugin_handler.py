@@ -1,8 +1,4 @@
-# python import
-# Core Services import
-
 plugin_handler = None
-
 
 class Plugin:
     """

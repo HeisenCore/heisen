@@ -1,77 +1,34 @@
-# Python Import
 from bson.json_util import dumps
 from collections import defaultdict
 from twisted.internet import reactor
-# from txjsonrpc import jsonrpclib
 from txjsonrpc.web import jsonrpc
 
-# Core Import
-from core import toLog
+from core.log import logger
 from config.settings import installed_component
 from core.manager.initialize_functions import initial_executer
-from core.patterns.class_singleton import singleton
 from services.component.component_generator import generate_class_component
 
 
-@singleton
 class CoreServices(jsonrpc.JSONRPC):
-    """
-        This is base API that for communicate with VIRGOLE.
-
-        This is used to get the header info so that we can test
-        authentication.
-    """
     global plugin_functions
     plugin_functions = []
 
     def __init__(self, user='', password=''):
         jsonrpc.JSONRPC.__init__(self)
 
-        # Settings Component
         self.set_name_spacing()
 
-        # Initial some functions
         reactor.callInThread(initial_executer, )
 
     def set_name_spacing(self):
-        """
-            Please set your component in this here.
-            This is follow namespace concept in your API service.
-            Usage:
-                Please call your component after API cursor when connection is
-                connected to the server.
-        """
         for component in installed_component:
-
             try:
                 klass = generate_class_component(component)
                 self.putSubHandler(component, klass())
 
             except Exception as e:
-                toLog("{}".format(e), 'error')
-                msg = "Component {} Faild to register!".format(component)
-                toLog(msg, 'error')
-
-    # def parseJsonRPC(self, request):
-    #     """
-    #         Initial parse for your request.
-    #         Please set & checked your token request in this here.
-    #     """
-        # content = request.content.read()
-        # if not content and request.method == 'GET' and 'request' in request.args:
-        #     content = request.args['request'][0]
-        # parse = jsonrpclib.loads(content)
-        # token = parse.get('token', 0)
-        # method = parse.get('method')
-        # id = parse.get('id')
-        # version = parse.get('jsonrpc')
-        # method_list = ['get_token', 'authorize', 'check_expire']
-        # ip = request.getClientIP()
-        # if token == 0 and method in method_list:
-        #     pass
-
-    # def render(self, request):
-    #     return jsonrpc.JSONRPC.render(self, request)
+                logger.exception(e)
+                logger.error("Component {} Faild to register!".format(component))
 
     def jsonrpc_authinfo(self):
         return (self.request.getUser(), self.request.getPassword())
@@ -83,9 +40,6 @@ class CoreServices(jsonrpc.JSONRPC):
     jsonrpc_methodHelp.signature = [['string', 'string']]
 
     def jsonrpc_listMethods(self):
-        """
-        Return a list of the method names implemented by this server.
-        """
         functions = []
         new_list = []
         dd = defaultdict(list)

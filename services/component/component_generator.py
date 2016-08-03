@@ -9,6 +9,7 @@ def generate_class_component(name):
 
         def __init__(self):
             BaseRPC.__init__(self)
+
             toLog('-- Loading {} Plugins --'.format(class_name), 'service')
             load_module = __import__("services")
             classobj = getattr(load_module.plugins, name)

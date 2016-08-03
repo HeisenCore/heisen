@@ -173,8 +173,7 @@ def exception_handler(cls):
             toLog(msg, 'error')
 
             try:
-                error = ErrorGeneratorFromRaise(
-                    msg, e.type_error).generateException()
+                error = ErrorGeneratorFromRaise(msg, e.type_error).generateException()
                 return error
 
             except:

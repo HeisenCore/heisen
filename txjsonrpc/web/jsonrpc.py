@@ -160,11 +160,11 @@ class JSONRPC(resource.Resource, BaseSubhandler):
             else:
                 request.setHeader("content-type", "text/javascript")
 
-            if getattr(function, 'with_request', False):
-                d = defer.maybeDeferred(function, request, *args)
-
             if getattr(function, 'with_activity_log', False):
                 d = defer.maybeDeferred(function, username, address, *args)
+
+            elif getattr(function, 'with_request', False):
+                d = defer.maybeDeferred(function, request, *args)
 
             else:
                 d = defer.maybeDeferred(function, *args)

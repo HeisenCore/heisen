@@ -16,9 +16,10 @@ import xmlrpclib
 
 from twisted.web import resource, server
 from twisted.internet import defer, reactor
-from twisted.python import log
 from twisted.web import http
 
+from bson import json_util
+from core.log import logger
 from config.settings import APP_NAME
 from txjsonrpc import jsonrpclib
 from txjsonrpc.jsonrpc import BaseProxy, BaseQueryFactory, BaseSubhandler
@@ -175,11 +176,13 @@ class JSONRPC(resource.Resource, BaseSubhandler):
             if not isinstance(result, jsonrpclib.Fault):
                 result = (result,)
             # Convert the result (python) to JSON-RPC
+
         try:
-            s = jsonrpclib.dumps(result, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback,jsonrpclib.dumps(result, id=id, version=version))
+            s = json_util.dumps(result, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, json_util.dumps(result, id=id, version=version))
         except:
             f = jsonrpclib.Fault(self.FAILURE, "can't serialize output")
-            s = jsonrpclib.dumps(f, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback,jsonrpclib.dumps(f, id=id, version=version))
+            s = json_util.dumps(f, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, json_util.dumps(f, id=id, version=version))
+
         request.setHeader("content-length", str(len(s)))
         request.write(s)
         request.finish()
@@ -187,8 +190,15 @@ class JSONRPC(resource.Resource, BaseSubhandler):
     def _ebRender(self, failure, id):
         if isinstance(failure.value, jsonrpclib.Fault):
             return failure.value
-        log.err(failure)
-        return jsonrpclib.Fault(self.FAILURE, "error")
+
+        logger.exception(failure.getTraceback())
+
+        return jsonrpclib.Fault(
+            '{}: {}'.format(
+                failure.type.__name__,
+                failure.getErrorMessage()
+            ), "error"
+        )
 
 
 class QueryProtocol(http.HTTPClient):

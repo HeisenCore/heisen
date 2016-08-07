@@ -26,12 +26,15 @@ def load_apps(app_dir):
         if not dir_name.endswith('rpc'):
             continue
 
+        full_app_name = dir_name.replace(app_dir, '').strip('/').replace('/', '.').rstrip('.rpc')
+        logger.service('Adding App {}'.format(full_app_name))
+
         method_list = {}
         for method_name in methods:
             if method_name.startswith('__init__'):
                 continue
 
-            if not method_name.endswith('py'):
+            if not method_name.endswith('py'): # only load py files, refactor later for pyc and so files
                 continue
 
             file = None
@@ -41,21 +44,16 @@ def load_apps(app_dir):
                 method = imp.load_module(method_name, file, pathname, desc)
                 method_list[method_name] = method.RPC()
 
-                fullname = '{}{}'.format(
-                    dir_name.replace(app_dir, '').lstrip('/').rstrip('.rpc').replace('/', '.'),
-                    method_name
-                )
+                method_full_name = '{}.{}'.format(full_app_name, method_name)
 
-                logger.service('Added Plugin {}'.format(fullname))
-                setattr(method_list[method_name], '__full_name__', fullname)
+                logger.service('Added Plugin {}'.format(method_full_name))
+                setattr(method_list[method_name], '__full_name__', method_full_name)
             except Exception as e:
                 logger.exception(e)
                 if file is not None:
                     file.close()
 
-                print e
-
-        app_paths.append(dir_name)
+        app_paths.append(full_app_name)
         app_name = dir_name.split('/')[-2]
 
         app = App()
@@ -64,13 +62,13 @@ def load_apps(app_dir):
 
 
     for path in app_paths:
-        path.replace(app_dir, '').lstrip('/').rstrip('.rpc')
         parts = path.split('.')
 
         if len(parts) > 1:
             parent = parts[-2]
             child = parts[-1]
 
+            logger.service('Adding sub handler {} to {}'.format(child, parent))
             app_list[parent].set_sub_handler(child, app_list[child])
 
     return app_list
@@ -79,7 +77,7 @@ def load_apps(app_dir):
 def load_all_apps():
     all_apps = {}
     for app_dir in settings.APP_DIRS:
-        all_apps.update(load_apps(app_dir)) # /home/k1/src/main2/apps
+        all_apps.update(load_apps(app_dir))
 
 
     return all_apps

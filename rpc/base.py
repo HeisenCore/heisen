@@ -43,41 +43,41 @@ class PluginBase(object):
 
         if self.async:
             worker = deferToThreadPool(reactor, pool(), self.run, *args, **kwargs)
-            worker.addErrback(self._to_log_error)
+            # worker.addErrback(self._to_log_error)
 
             if DEBUG:
-                worker.addCallback(self._timeit, ts, args)
+                worker.addCallback(self._timeit, ts, args, kwargs)
 
-            worker.addCallback(self._write_activity_log, args)
+            worker.addCallback(self._write_activity_log, args, kwargs)
 
             return worker
         else:
             result = self.run(*args, **kwargs)
 
             if DEBUG:
-                self._timeit(result, ts, args)
+                self._timeit(result, ts, args, kwargs)
 
-            self._write_activity_log(result, args)
+            self._write_activity_log(result, args, kwargs)
 
             return result
 
 
-    def _timeit(self, result, ts, args):
+    def _timeit(self, result, ts, args, kwargs):
         te = time.time()
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
-        msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s - func: {4}({5})"
-        msg = msg.format(self.src, self.username, start_time, te-ts, self.func_name, args[1:])
+        msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s - func: {4} - args: {5} - kwargs: {6}"
+        msg = msg.format(self.src, self.username, start_time, te-ts, self.func_name, args, kwargs)
         logger.request(msg)
 
         return result
 
 
     def _to_log_error(self, failure):
-        logger.error(str(failure))
+        # logger.exception(failure)
+        return failure
 
-
-    def _write_activity_log(self, result, args):
+    def _write_activity_log(self, result, args, kwargs):
         if self.write_activity:
             doc = {
                 'created_date':  datetime.datetime.now(),

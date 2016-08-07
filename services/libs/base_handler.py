@@ -155,9 +155,6 @@ def exception_handler(cls):
 
     @wraps(cls)
     def checking(*args, **kwargs):
-        """
-           Exception Handler
-        """
         try:
             return cls(*args, **kwargs)
 

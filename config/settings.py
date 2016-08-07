@@ -42,7 +42,7 @@ LOGGERS = {
         'level': logging.INFO
     },
     'request': {
-        'format':'info',
+        'format':'basic',
         'level': logging.INFO
     },
     'debug': {

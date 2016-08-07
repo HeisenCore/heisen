@@ -1,26 +1,51 @@
-from core import toLog
+from core.log import logger
 from services.libs.base_rpc import BaseRPC
+from txjsonrpc.web import jsonrpc
+
+from config.settings import BASE_DIR
+from services.libs import plugin_handler
+from services.libs.plugin_loader import PluginLoader
+
+import os
+from os.path import join, getsize
+from collections import defaultdict
 
 
-def generate_class_component(name):
-    class_name = name.capitalize() + 'Component'
+def generate_class_component(app_dir):
+    apps = {}
+    all_files = defaultdict(list)
 
-    class Raw(BaseRPC, object):
+    for root, dirs, files in os.walk('.'):
+        if root.endswith('rpc'):
+            app_name = root.replace('/', '.')[7:]
 
-        def __init__(self):
-            BaseRPC.__init__(self)
+            for plugin in files:
+                if plugin.startswith('__init__'):
+                    continue
 
-            toLog('-- Loading {} Plugins --'.format(class_name), 'service')
-            load_module = __import__("services")
-            classobj = getattr(load_module.plugins, name)
-            load_flag = classobj.getFlag()
+                if plugin.split('.')[-1] in ['py', 'pyc', 'pyo', 'so']:
+                    all_files[app_name].append(plugin)
 
-            if not load_flag:
-                self.loadPlugins(name)
+    klass = type(app_name, (App, ), {})
 
-            self.setPlugins()
-            toLog('', 'service')
+    return apps
 
-    klass = type(class_name, (Raw, ), {})
 
-    return klass
+class App(jsonrpc.JSONRPC):
+    def set_methods(self, methods):
+        for method_name, method_class in methods.items():
+            setattr(self, 'jsonrpc_{}'.format(method_name), method_class.call)
+
+    def set_sub_handler(self, name, klass):
+        self.putSubHandler(name, klass())
+
+
+def reg():
+    for component in installed_component:
+        try:
+            klass = generate_class_component(component)
+            self.putSubHandler(component, klass())
+
+        except Exception as e:
+            logger.exception(e)
+            logger.error("Component {} Faild to register!".format(component))

@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from pymongo import ReadPreference
 from pymongo import monitoring
 
-from core import toLog, logException
+from core.log import logger
 from config import settings
 from core.patterns.class_singleton import Singleton
 
@@ -35,7 +35,7 @@ class CommandLogger(monitoring.CommandListener):
             event.database_name, collection,
             event.command_name, command_string
         )
-        toLog(string, 'db')
+        logger.db(string)
 
     def succeeded(self, event):
         replay_string = ''
@@ -47,7 +47,7 @@ class CommandLogger(monitoring.CommandListener):
             event.connection_id[0], event.connection_id[1],
             event.command_name, event.duration_micros, replay_string
         )
-        toLog(string, 'db')
+        logger.db(string)
 
     def failed(self, event):
         string = '[Failed] ID {} {}:{} {}, Time: {}, Failure: {}'.format(
@@ -55,7 +55,7 @@ class CommandLogger(monitoring.CommandListener):
             event.connection_id[0], event.connection_id[1],
             event.command_name, event.duration_micros, event.failure
         )
-        toLog(string, 'db')
+        logger.db(string)
 
 
 class MongoConnection(object):
@@ -63,7 +63,7 @@ class MongoConnection(object):
     config_name = None
 
     def __init__(self):
-        toLog('Creating cursor instance for {} db'.format(self.config_name), 'db')
+        logger.db('Creating cursor instance for {} db'.format(self.config_name))
         self.db_settings = settings.DATABASES[self.config_name]
 
         self.get_connection()

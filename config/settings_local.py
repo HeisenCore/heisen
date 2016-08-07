@@ -1,6 +1,5 @@
 # coding: utf-8
 
-APP_NAME = ''
-
-AP_DB_HOST = 'localhost'
-AP_DB_PORT = 27017
+APP_DIRS = [
+    '/home/k1/src/main2/apps',
+]

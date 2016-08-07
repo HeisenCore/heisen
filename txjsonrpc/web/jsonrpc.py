@@ -19,7 +19,7 @@ from twisted.internet import defer, reactor
 from twisted.python import log
 from twisted.web import http
 
-from config.settings import CORE_NAME
+from config.settings import APP_NAME
 from txjsonrpc import jsonrpclib
 from txjsonrpc.jsonrpc import BaseProxy, BaseQueryFactory, BaseSubhandler
 
@@ -137,35 +137,29 @@ class JSONRPC(resource.Resource, BaseSubhandler):
 
         if request.getAllHeaders().get('x-user', None):
             username = request.getAllHeaders().get('x-user', None)
-
         else:
-            username = CORE_NAME
+            username = APP_NAME
 
         if request.getAllHeaders().get('x-address', None):
             address = request.getAllHeaders().get('x-address', None)
-
         else:
             address = 'localhost'
 
         try:
             function = self._getFunction(functionPath)
-
         except jsonrpclib.Fault, f:
             self._cbRender(f, request, id, version)
 
         else:
             if not self.is_jsonp:
                 request.setHeader("content-type", "text/json")
-
             else:
                 request.setHeader("content-type", "text/javascript")
 
             if getattr(function, 'with_activity_log', False):
                 d = defer.maybeDeferred(function, username, address, *args)
-
             elif getattr(function, 'with_request', False):
                 d = defer.maybeDeferred(function, request, *args)
-
             else:
                 d = defer.maybeDeferred(function, *args)
 

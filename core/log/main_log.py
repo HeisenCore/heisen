@@ -10,7 +10,6 @@ import logging.handlers
 import warnings
 from functools import partial
 
-from core import settings
 from core.patterns.class_singleton import Singleton
 from config import settings
 
@@ -29,7 +28,7 @@ class FormatterWithContextForException(logging.Formatter):
 class FilterWithAbsoluteModuleName(logging.Filter):
     def filter(self, record):
         record.absoluteModuleName = record.pathname.replace('.py', '', 1)\
-                                                   .replace(BASE_DIR, '', 1)\
+                                                   .replace(settings.BASE_DIR, '', 1)\
                                                    .replace('/', '.')\
                                                    .lstrip('.')
 
@@ -69,7 +68,7 @@ class Logger(object):
                 logger_config['format'],
                 logger_config['level'],
             )
-            setattr(self, logger_name, partial(logger.logger))
+            setattr(self, logger_name, partial(logger.info))
 
             getattr(self, logger_name)(
                 '--- Starting {} Logs ---'.format(logger_name.capitalize())
@@ -80,7 +79,7 @@ class Logger(object):
             '{}\n{}'.format(str(message), getExceptionText())
         )
 
-    def setup(logger_name, logger_level, logger_format):
+    def setup(self, logger_name, logger_format, logger_level):
         logger = logging.getLogger(logger_name)
         logger.disabled = False
         logger.setLevel(logger_level)

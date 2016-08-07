@@ -7,7 +7,9 @@ import pytz
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 LOCAL_TZ = pytz.timezone('Asia/Tehran')
-RPC_PORT = 7080
+RPC_PORT = 7089
+
+DEBUG = True
 
 BACKGROUND_PROCESS_THREAD_POOL = 120
 MAIN_MIN_THREAD = 30
@@ -61,16 +63,12 @@ LOGGERS = {
     },
 }
 
-installed_component = [
-    "main",
-    "jobs",
-    "entry",
-    "raspberry",
-    "resource",
-    "pa"
-]
+DATABASES = {}
 
+APP_NAME = 'app'
 
+AP_DB_HOST = 'localhost'
+AP_DB_PORT = 27017
 
 try:
     from settings_local import *

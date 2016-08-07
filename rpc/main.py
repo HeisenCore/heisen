@@ -4,9 +4,8 @@ from twisted.internet import reactor
 from txjsonrpc.web import jsonrpc
 
 from core.log import logger
-from config.settings import installed_component
-from core.manager.initialize_functions import initial_executer
-from services.component.component_generator import generate_class_component
+# from core.manager.initialize_functions import initial_executer
+from rpc import app_loader
 
 
 class CoreServices(jsonrpc.JSONRPC):
@@ -16,19 +15,17 @@ class CoreServices(jsonrpc.JSONRPC):
     def __init__(self, user='', password=''):
         jsonrpc.JSONRPC.__init__(self)
 
-        self.set_name_spacing()
+        self.load_apps()
 
-        reactor.callInThread(initial_executer, )
+        # reactor.callInThread(initial_executer, )
 
-    def set_name_spacing(self):
-        for component in installed_component:
+    def load_apps(self):
+        for component, klass in app_loader.load_all_apps().items():
             try:
-                klass = generate_class_component(component)
-                self.putSubHandler(component, klass())
-
+                self.putSubHandler(component, klass)
             except Exception as e:
                 logger.exception(e)
-                logger.error("Component {} Faild to register!".format(component))
+                logger.service("App {} failed to register".format(component))
 
     def jsonrpc_authinfo(self):
         return (self.request.getUser(), self.request.getPassword())

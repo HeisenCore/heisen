@@ -5,12 +5,10 @@ from Queue import Queue
 from threading import Thread
 from twisted.python.threadpool import ThreadPool
 
-
-# Core Services import
-from config.settings import background_process_thread_pool
-from config.settings import main_min_thread as min_t
-from config.settings import main_max_thread as max_t
-from core import toLog
+from config.settings import BACKGROUND_PROCESS_THREAD_POOL
+from config.settings import MAIN_MIN_THREAD as min_t
+from config.settings import MAIN_MAX_THREAD as max_t
+from core.log import logger
 
 
 class Worker(Thread):
@@ -28,7 +26,7 @@ class Worker(Thread):
             try:
                 func(*args, **kargs)
             except Exception, e:
-                toLog('Thread Error: %s' % e, 'error')
+                logger.error('Thread Error: %s' % e)
             self.tasks.task_done()
 
 
@@ -45,11 +43,11 @@ class ThreadPoolPython:
 
         key = random.randint(1000, 100000)
         msg = "Calling background process with id: {0} -- func: {1}"
-        toLog(msg.format(key, func.__name__), 'jobs')
+        logger.jobs(msg.format(key, func.__name__))
 
         self.tasks.put((func, args, kwargs))
 
-        toLog("End of background process with id: {0}".format(key), 'jobs')
+        logger.jobs("End of background process with id: {0}".format(key))
 
     def wait_completion(self):
         """Wait for completion of all the tasks in the queue"""
@@ -57,7 +55,7 @@ class ThreadPoolPython:
 
 
 def get_pool():
-    pool = ThreadPoolPython(background_process_thread_pool)
+    pool = ThreadPoolPython(BACKGROUND_PROCESS_THREAD_POOL)
     return pool
 
 

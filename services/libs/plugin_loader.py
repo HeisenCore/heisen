@@ -8,24 +8,6 @@ from core import toLog
 
 
 class PluginLoader:
-    def initPluginsAndRegister(self, directory, mapping):
-        """
-            Load all plugins in directory and try to register plugin
-            members using mapping
-            directory(text) :   directory path to search for plugins
-
-            mapping(dic)    :   a dict in format {Class: registerMethod}
-                                all plugins are searched for children of
-                                Classes, and upon find, pass it registerMethod
-                                to get registered
-        """
-        modules = self.initPlugins(directory)
-
-        for module in modules.itervalues():
-            self.__registerModuleAttributes(module, mapping)
-
-        return modules
-
     def initPlugins(self, directory):
         """
             directory(text): directory path to search for plugins
@@ -40,27 +22,6 @@ class PluginLoader:
         modules.update(self.__loadModules(py_files, directory))
         self.__callInits(modules)
         return modules
-
-    def __registerModuleAttributes(self, module, mapping):
-        """
-            Find all attribute classes in module and register
-            it in attribute factory attribute classes are inherited
-            from attributNe parents available in mapping
-        """
-        toLog('RegisterModuleAttributes: processing module: %s' % module, 'service')
-
-        for obj_name in dir(module):
-            obj = getattr(module, obj_name)
-
-            if self.__isClass(obj):
-
-                for klass in mapping:
-                    toLog('RegisterModuleAttributes: obj = %s klass: %s subclass = %s' % (
-                        obj, klass, issubclass(obj, klass)
-                    ), 'service')
-
-                    if issubclass(obj, klass) and obj != klass:
-                        mapping[klass](obj)
 
     def __isClass(self, obj):
         return isinstance(obj, types.ClassType)

@@ -35,35 +35,37 @@ class PluginBase(object):
         self.src = kwargs.pop('rpc_address', None)
         time_start = time.time()
 
-        if self.schema:
-            validator = Validator(self.schema)
-            valid = validator.validate(args)
-            if not valid:
-                raise AttributeError(validator.errors)
+        self._validate()
 
         if self.async:
             worker = deferToThreadPool(reactor, pool(), self.run, *args, **kwargs)
 
-            if DEBUG:
-                worker.addCallback(self._timeit, time_start, args, kwargs)
-
-            if self.write_activity:
-                worker.addCallback(self._write_activity_log, args, kwargs)
+            worker.addCallback(self._timeit, time_start, args, kwargs)
+            worker.addCallback(self._write_activity_log, args, kwargs)
 
             return worker
         else:
             result = self.run(*args, **kwargs)
 
-            if DEBUG:
-                self._timeit(result, time_start, args, kwargs)
-
-            if self.write_activity:
-                self._write_activity_log(result, args, kwargs)
+            self._timeit(result, time_start, args, kwargs)
+            self._write_activity_log(result, args, kwargs)
 
             return result
 
+    def _validate(self):
+        if not self.schema:
+            return
+
+        validator = Validator(self.schema)
+        valid = validator.validate(args)
+        if not valid:
+            raise AttributeError(validator.errors)
+
 
     def _timeit(self, result, ts, args, kwargs):
+        if not DEBUG:
+            return result
+
         te = time.time()
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
@@ -74,6 +76,9 @@ class PluginBase(object):
         return result
 
     def _write_activity_log(self, result, args, kwargs):
+        if not self.write_activity:
+            return result
+
         doc = {
             'created_date':  datetime.datetime.now(),
             'username': self.username,

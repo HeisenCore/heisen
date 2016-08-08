@@ -18,7 +18,6 @@ from twisted.web import resource, server
 from twisted.internet import defer, reactor
 from twisted.web import http
 
-from bson import json_util
 from core.log import logger
 from config.settings import APP_NAME
 from txjsonrpc import jsonrpclib
@@ -158,9 +157,11 @@ class JSONRPC(resource.Resource, BaseSubhandler):
                 request.setHeader("content-type", "text/javascript")
 
             if getattr(function, 'with_activity_log', False):
-                d = defer.maybeDeferred(function, username, address, *args)
+                d = defer.maybeDeferred(
+                    function, rpc_username=username, rpc_address=address, *args
+                )
             elif getattr(function, 'with_request', False):
-                d = defer.maybeDeferred(function, request, *args)
+                d = defer.maybeDeferred(function, rpc_request=request, *args)
             else:
                 d = defer.maybeDeferred(function, *args)
 
@@ -178,10 +179,10 @@ class JSONRPC(resource.Resource, BaseSubhandler):
             # Convert the result (python) to JSON-RPC
 
         try:
-            s = json_util.dumps(result, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, json_util.dumps(result, id=id, version=version))
+            s = jsonrpclib.dumps(result, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, jsonrpclib.dumps(result, id=id, version=version))
         except:
             f = jsonrpclib.Fault(self.FAILURE, "can't serialize output")
-            s = json_util.dumps(f, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, json_util.dumps(f, id=id, version=version))
+            s = jsonrpclib.dumps(f, id=id, version=version) if not self.is_jsonp else "%s(%s)" %(self.callback, jsonrpclib.dumps(f, id=id, version=version))
 
         request.setHeader("content-length", str(len(s)))
         request.write(s)

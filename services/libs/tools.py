@@ -11,12 +11,8 @@ from cerberus import Validator
 from cerberus import errors
 
 
-# Core Services import
-
-
 def getToken(dict):
-    unique_str = ''.join(["'%s':'%s';" % (key, val) for
-                          (key, val) in sorted(dict.items())])
+    unique_str = ''.join(["'%s':'%s';" % (key, val) for (key, val) in sorted(dict.items())])
     token = hashlib.sha1(unique_str).hexdigest()
     # token = base64.b64encode(hashlib.sha1(unique_str).digest())
     return token
@@ -37,8 +33,7 @@ def uniqueCode(seed):
 
 
 def convertFromEpochToStamp(_time):
-    stamp = datetime.datetime.fromtimestamp(
-        _time).strftime('%Y-%m-%d %H:%M:%S')
+    stamp = datetime.datetime.fromtimestamp(_time).strftime('%Y-%m-%d %H:%M:%S')
     return stamp
 
 
@@ -65,9 +60,3 @@ class MongoValidator(Validator):
 
         if not isinstance(value, Regex):
             self._error(field, errors.ERROR_BAD_TYPE % 'BsonRegex')
-
-
-def discount_all_product(price):
-    discount = price['sell'] - price['buy']
-    discount *= 0.02
-    return price['sell'] - discount

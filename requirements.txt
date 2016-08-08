@@ -1,19 +1,15 @@
-# Contains requirements common to all environments
 dateutils
 jsonrpclib
 pymongo
-pillow
-paramiko==1.16.0
 jdatetime
 twisted
 cerberus
 bcrypt
-pyowm
 apscheduler
 # cryptography
 python-dateutil
 pytz
-#txjsonrpc
 pjson
-ipython==2.4.1
+ipython
+ipdb
 pre-commit

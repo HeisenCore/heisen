@@ -2,12 +2,11 @@ import abc
 import datetime
 import time
 
-from functools import wraps
 from twisted.internet import reactor
-# from twisted.internet.threads import deferToThread
 from twisted.internet.threads import deferToThreadPool
+from cerberus import Validator
+from cerberus import errors
 
-# from base_handler import exception_handler
 from config.settings import APP_NAME
 from config.settings import DEBUG
 
@@ -18,46 +17,48 @@ from core.threading_pool.core_thread import get_twisted_pool as pool
 
 class PluginBase(object):
     __metaclass__ = abc.ABCMeta
-
-    def __init__(self):
-        self.call.__func__.with_activity_log = True
-
     write_activity = True
     async = True
+    schema = {}
 
     @abc.abstractmethod
     def run(self):
         pass
 
+    def __init__(self):
+        if self.write_activity:
+            self.call.__func__.with_activity_log = True
+
     def call(self, *args, **kwargs):
-        # self.run = exception_handler(self.run)
-
         self.func_name = self.__full_name__
+        self.username = kwargs.pop('rpc_username', None)
+        self.src = kwargs.pop('rpc_address', None)
+        time_start = time.time()
 
-        args = list(args)
-        self.username = args.pop(0)
-        self.src = args.pop(0)
-        args = tuple(args)
-
-        ts = time.time()
+        if self.schema:
+            validator = Validator(self.schema)
+            valid = validator.validate(args)
+            if not valid:
+                raise AttributeError(validator.errors)
 
         if self.async:
             worker = deferToThreadPool(reactor, pool(), self.run, *args, **kwargs)
-            # worker.addErrback(self._to_log_error)
 
             if DEBUG:
-                worker.addCallback(self._timeit, ts, args, kwargs)
+                worker.addCallback(self._timeit, time_start, args, kwargs)
 
-            worker.addCallback(self._write_activity_log, args, kwargs)
+            if self.write_activity:
+                worker.addCallback(self._write_activity_log, args, kwargs)
 
             return worker
         else:
             result = self.run(*args, **kwargs)
 
             if DEBUG:
-                self._timeit(result, ts, args, kwargs)
+                self._timeit(result, time_start, args, kwargs)
 
-            self._write_activity_log(result, args, kwargs)
+            if self.write_activity:
+                self._write_activity_log(result, args, kwargs)
 
             return result
 
@@ -72,25 +73,19 @@ class PluginBase(object):
 
         return result
 
-
-    def _to_log_error(self, failure):
-        # logger.exception(failure)
-        return failure
-
     def _write_activity_log(self, result, args, kwargs):
-        if self.write_activity:
-            doc = {
-                'created_date':  datetime.datetime.now(),
-                'username': self.username,
-                'api_name': self.func_name,
-                'address': self.src,
-                'action': getattr(self, 'activity_name', self.func_name),
-                'args': args[1:],
-            }
+        doc = {
+            'created_date':  datetime.datetime.now(),
+            'username': self.username,
+            'api_name': self.func_name,
+            'address': self.src,
+            'action': getattr(self, 'activity_name', self.func_name),
+            'args': args[1:],
+        }
 
-            if hasattr(self, 'refine_activity_log'):
-                doc = self.refine_activity_log(doc)
+        if hasattr(self, 'refine_activity_log'):
+            doc = self.refine_activity_log(doc)
 
-            # cursor_local.activity_log.insert(doc)
+        # cursor_local.activity_log.insert(doc)
 
         return result

@@ -1,6 +1,7 @@
 import re
 import datetime
 
+
 def email_validator(email):
     pattern = re.compile('^[a-zA-Z0-9._]+\\@[a-zA-Z0-9._]+\\.[a-zA-Z]{3,}$')
     check_mail = re.match(pattern, email)

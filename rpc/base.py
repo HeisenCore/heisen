@@ -1,11 +1,11 @@
 import abc
+import inspect
 import datetime
 import time
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
-from cerberus import Validator
-from cerberus import errors
+from cerberus import Validator, ValidationError
 
 from config.settings import APP_NAME
 from config.settings import DEBUG
@@ -35,7 +35,7 @@ class PluginBase(object):
         self.src = kwargs.pop('rpc_address', None)
         time_start = time.time()
 
-        self._validate()
+        self._validate(*args, **kwargs)
 
         if self.async:
             worker = deferToThreadPool(reactor, pool(), self.run, *args, **kwargs)
@@ -52,14 +52,20 @@ class PluginBase(object):
 
             return result
 
-    def _validate(self):
+    def _validate(self, *args, **kwargs):
         if not self.schema:
             return
 
-        validator = Validator(self.schema)
-        valid = validator.validate(args)
+        method_args = inspect.getargs(self.run.im_func.func_code).args
+        method_args.remove('self')
+
+        args_dict = dict(zip(method_args, args))
+
+        validator = Validator(allow_unknown=True)
+        valid = validator.validate(args_dict, self.schema)
+
         if not valid:
-            raise AttributeError(validator.errors)
+            raise ValidationError(validator.errors)
 
 
     def _timeit(self, result, ts, args, kwargs):

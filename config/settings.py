@@ -8,6 +8,7 @@ import pytz
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 LOCAL_TZ = pytz.timezone('Asia/Tehran')
 RPC_PORT = 7089
+APP_NAME = 'app'
 
 DEBUG = True
 
@@ -20,6 +21,7 @@ AP_THREADPOOL_EXECUTOR = 20
 AP_PROCESSPOOL_EXECUTOR = 10
 AP_COALESCE = False
 AP_MAX_INSTANCES = 7
+AP_DATABASE = 'default'
 
 LOG_DIR = '/var/log/core/'
 LOG_MAX_BYTES = 1000000
@@ -63,12 +65,20 @@ LOGGERS = {
     },
 }
 
-DATABASES = {}
+DATABASES = {
+    'default': {
+        'host': 'localhost',
+        'port': 27017,
+        'db': APP_NAME,
+        'log_query': False,
+        'log_query_data': False,
+        'log_results': False,
+    },
+}
 
-APP_NAME = 'app'
+ACTIVITY_LOG_DATABASE = 'default'
 
-AP_DB_HOST = 'localhost'
-AP_DB_PORT = 27017
+VALIDATOR_CLASS = 'core.validator.validator.Validator'
 
 try:
     from settings_local import *

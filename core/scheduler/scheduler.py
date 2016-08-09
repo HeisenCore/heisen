@@ -22,8 +22,8 @@ job_defaults = {
 scheduler = TwistedScheduler(timezone=settings.LOCAL_TZ)
 scheduler.add_jobstore(
     'mongodb',
-    host=settings.AP_DB_HOST,
-    port=settings.AP_DB_PORT,
+    host=settings.DATABASES[settings.AP_DATABASE]['host'],
+    port=settings.DATABASES[settings.AP_DATABASE]['port'],
     collection=settings.APP_NAME
 )
 

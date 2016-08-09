@@ -5,10 +5,12 @@ import time
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
-from cerberus import Validator, ValidationError
+from cerberus import ValidationError
+import import_string
 
 from config.settings import APP_NAME
 from config.settings import DEBUG
+from config.settings import VALIDATOR_CLASS
 
 from core.log import logger
 # from core.db import cursor_local
@@ -61,7 +63,8 @@ class PluginBase(object):
 
         args_dict = dict(zip(method_args, args))
 
-        validator = Validator(allow_unknown=True)
+        validator_class = import_string(VALIDATOR_CLASS)
+        validator = validator_class(allow_unknown=True)
         valid = validator.validate(args_dict, self.schema)
 
         if not valid:

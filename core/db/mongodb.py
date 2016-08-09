@@ -4,9 +4,10 @@ from pymongo import MongoClient
 from pymongo import ReadPreference
 from pymongo import monitoring
 
+from config.settings import DATABASES
 from core.log import logger
 from config import settings
-from core.patterns.class_singleton import Singleton
+from core.utils.singleton import Singleton
 
 
 class CommandLogger(monitoring.CommandListener):
@@ -60,11 +61,9 @@ class CommandLogger(monitoring.CommandListener):
 
 class MongoConnection(object):
     __db = None
-    config_name = None
-
-    def __init__(self):
-        logger.db('Creating cursor instance for {} db'.format(self.config_name))
-        self.db_settings = settings.DATABASES[self.config_name]
+    def __init__(self, config_name):
+        logger.db('Creating cursor instance for {} db'.format(config_name))
+        self.db_settings = settings.DATABASES[config_name]
 
         self.get_connection()
         self.ensure_indexes()
@@ -111,13 +110,7 @@ class MongoConnection(object):
 
 
 @Singleton
-class GlobalDB(MongoConnection):
-    config_name = 'global'
-
-@Singleton
-class LocalDB(MongoConnection):
-    config_name = 'local'
-
-@Singleton
-class SelfDB(MongoConnection):
-    config_name = 'self'
+class MongoDatabases(object):
+    def __init__(self):
+        for database in DATABASES.keys():
+            setattr(self, database, MongoConnection(database).get_cursor())

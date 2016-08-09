@@ -1,6 +1,5 @@
-from mongo_drivers import GlobalDB, LocalDB, SelfDB
+from mongodb import MongoDatabases
+from config.settings import DATABASES
 
 
-# cursor_global = GlobalDB().get_cursor()
-# cursor_local = LocalDB().get_cursor()
-# cursor_self = SelfDB().get_cursor()
+db = MongoDatabases()

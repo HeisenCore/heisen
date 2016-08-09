@@ -9,7 +9,7 @@ from cerberus import ValidationError
 import import_string
 
 from config.settings import APP_NAME
-from config.settings import DEBUG
+from config.settings import LOG_REQUEST
 from config.settings import VALIDATOR_CLASS
 
 from core.log import logger
@@ -72,7 +72,7 @@ class PluginBase(object):
 
 
     def _timeit(self, result, ts, args, kwargs):
-        if not DEBUG:
+        if not LOG_REQUEST:
             return result
 
         te = time.time()
@@ -94,7 +94,7 @@ class PluginBase(object):
             'api_name': self.func_name,
             'address': self.src,
             'action': getattr(self, 'activity_name', self.func_name),
-            'args': args[1:],
+            'args': args,
         }
 
         if hasattr(self, 'refine_activity_log'):

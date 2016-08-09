@@ -1,5 +1,3 @@
-
-
 def Singleton(class_):
     """
         Returns the singleton instance. Upon its first call, it creates a

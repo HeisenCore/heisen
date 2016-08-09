@@ -10,7 +10,7 @@ import logging.handlers
 import warnings
 from functools import partial
 
-from core.patterns.class_singleton import Singleton
+from core.utils.singleton import Singleton
 from config import settings
 
 

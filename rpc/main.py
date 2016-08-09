@@ -24,8 +24,11 @@ class CoreServices(jsonrpc.JSONRPC):
             try:
                 self.putSubHandler(component, klass)
             except Exception as e:
-                logger.exception(e)
+                logger.exception(e, 'service')
                 logger.service("App {} failed to register".format(component))
+
+    def run_start_up(self):
+        pass
 
     def jsonrpc_authinfo(self):
         return (self.request.getUser(), self.request.getPassword())

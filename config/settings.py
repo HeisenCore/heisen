@@ -16,16 +16,20 @@ BACKGROUND_PROCESS_THREAD_POOL = 120
 MAIN_MIN_THREAD = 30
 MAIN_MAX_THREAD = 80
 
-# Scheduler & CronJob
 AP_THREADPOOL_EXECUTOR = 20
 AP_PROCESSPOOL_EXECUTOR = 10
 AP_COALESCE = False
 AP_MAX_INSTANCES = 7
 AP_DATABASE = 'default'
 
+ACTIVITY_LOG_DATABASE = 'default'
+
+VALIDATOR_CLASS = 'core.validator.validator.Validator'
+
 LOG_DIR = '/var/log/core/'
 LOG_MAX_BYTES = 1000000
 LOG_BACKUP_COUNT = 10
+LOG_REQUEST = True
 LOGGERS = {
     'error': {
         'format':'complete',
@@ -75,10 +79,6 @@ DATABASES = {
         'log_results': False,
     },
 }
-
-ACTIVITY_LOG_DATABASE = 'default'
-
-VALIDATOR_CLASS = 'core.validator.validator.Validator'
 
 try:
     from settings_local import *

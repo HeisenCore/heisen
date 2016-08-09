@@ -6,7 +6,6 @@ twisted
 cerberus
 bcrypt
 apscheduler
-# cryptography
 python-dateutil
 pytz
 pjson

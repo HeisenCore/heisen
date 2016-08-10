@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-test_core
+test_heisen
 ----------------------------------
 
-Tests for `core` module.
+Tests for `heisen` module.
 """
 
 
@@ -14,12 +14,12 @@ import unittest
 from contextlib import contextmanager
 from click.testing import CliRunner
 
-from core import core
-from core import cli
+from heisen import heisen
+from heisen import cli
 
 
 
-class TestCore(unittest.TestCase):
+class TestHeisen(unittest.TestCase):
 
     def setUp(self):
         pass
@@ -34,7 +34,7 @@ class TestCore(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(cli.main)
         assert result.exit_code == 0
-        assert 'core.cli.main' in result.output
+        assert 'heisen.cli.main' in result.output
         help_result = runner.invoke(cli.main, ['--help'])
         assert help_result.exit_code == 0
         assert '--help  Show this message and exit.' in help_result.output

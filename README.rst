@@ -1,28 +1,28 @@
 ===============================
-Core
+heisen
 ===============================
 
 
-.. image:: https://img.shields.io/pypi/v/core.svg
-        :target: https://pypi.python.org/pypi/core
+.. image:: https://img.shields.io/pypi/v/heisen.svg
+        :target: https://pypi.python.org/pypi/heisen
 
-.. image:: https://img.shields.io/travis/k1-hedayati/core.svg
-        :target: https://travis-ci.org/k1-hedayati/core
+.. image:: https://img.shields.io/travis/k1-hedayati/heisen.svg
+        :target: https://travis-ci.org/k1-hedayati/heisen
 
-.. image:: https://readthedocs.org/projects/core/badge/?version=latest
-        :target: https://core.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/heisen/badge/?version=latest
+        :target: https://heisen.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/k1-hedayati/core/shield.svg
-     :target: https://pyup.io/repos/github/k1-hedayati/core/
+.. image:: https://pyup.io/repos/github/k1-hedayati/heisen/shield.svg
+     :target: https://pyup.io/repos/github/k1-hedayati/heisen/
      :alt: Updates
 
 
-Awesome Core
+Awesome heisen
 
 
 * Free software: MIT license
-* Documentation: https://core.readthedocs.io.
+* Documentation: https://heisen.readthedocs.io.
 
 
 Features

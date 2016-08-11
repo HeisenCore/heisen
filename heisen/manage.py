@@ -49,27 +49,11 @@ def main():
 
     if len(sys.argv) > 1:
 
-        if sys.argv[1] == 'runserver':
-            from rpc.run import start_service
-            start_service()
-
-        elif sys.argv[1] == 'start_component':
+        if sys.argv[1] == 'start_component':
             from core.manager.execute_start_component import start_component
 
             # Create component
             start_component(sys.argv[2])
-
-        elif sys.argv[1] == 'shutdown':
-            from jsonrpclib import Server
-            from socket import error
-            from config.settings import CORE_PORT
-
-            try:
-                conn = Server('http://rostamkhAn!shoja:p4ssw0rdVahdaTi@localhost:{0}'.format(CORE_PORT))
-                conn.main.stop()
-
-            except error:
-                print 'Core Services shutdown \t\t\t\t\t\t[OK]'
 
         elif sys.argv[1] == 'logs':
             from os import system

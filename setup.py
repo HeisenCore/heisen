@@ -18,28 +18,28 @@ test_requirements = [
 ]
 
 setup(
-    name='core',
+    name='heisen',
     version='0.1.0',
-    description="Awesome Core",
+    description="Awesome heisen",
     long_description=readme + '\n\n' + history,
     author="Keyvan Hedayati",
     author_email='k1.hedayati93@gmail.com',
-    url='https://github.com/k1-hedayati/core',
+    url='https://github.com/k1-hedayati/heisen',
     packages=[
-        'core',
+        'heisen',
     ],
-    package_dir={'core':
-                 'core'},
+    package_dir={'heisen':
+                 'heisen'},
     entry_points={
         'console_scripts': [
-            'core=core.cli:main'
+            'heisen=heisen.cli:main'
         ]
     },
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='core',
+    keywords='heisen',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

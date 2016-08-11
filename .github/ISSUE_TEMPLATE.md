@@ -1,4 +1,4 @@
-* Core version:
+* heisen version:
 * Python version:
 * Operating System:
 

@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use Core in a project::
+To use heisen in a project::
 
-    import core
+    import heisen

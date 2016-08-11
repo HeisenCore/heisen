@@ -5,8 +5,8 @@ from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.twisted import TwistedScheduler
 
-from config import settings
-from core.log import logger
+from heisen.config import settings
+from heisen.core.log import logger
 
 
 executors = {

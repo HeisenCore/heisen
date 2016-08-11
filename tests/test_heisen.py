@@ -12,7 +12,6 @@ Tests for `heisen` module.
 import sys
 import unittest
 from contextlib import contextmanager
-from click.testing import CliRunner
 
 from heisen import heisen
 from heisen import cli
@@ -31,13 +30,7 @@ class TestHeisen(unittest.TestCase):
         pass
 
     def test_command_line_interface(self):
-        runner = CliRunner()
-        result = runner.invoke(cli.main)
-        assert result.exit_code == 0
-        assert 'heisen.cli.main' in result.output
-        help_result = runner.invoke(cli.main, ['--help'])
-        assert help_result.exit_code == 0
-        assert '--help  Show this message and exit.' in help_result.output
+        pass
 
 
 if __name__ == '__main__':

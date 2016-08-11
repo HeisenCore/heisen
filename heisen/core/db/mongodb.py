@@ -4,10 +4,10 @@ from pymongo import MongoClient
 from pymongo import ReadPreference
 from pymongo import monitoring
 
-from config.settings import DATABASES
-from core.log import logger
-from config import settings
-from core.utils.singleton import Singleton
+from heisen.config.settings import DATABASES
+from heisen.core.log import logger
+from heisen.config import settings
+from heisen.core.utils.singleton import Singleton
 
 
 class CommandLogger(monitoring.CommandListener):

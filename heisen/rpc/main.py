@@ -3,9 +3,9 @@ from collections import defaultdict
 from twisted.internet import reactor
 from txjsonrpc.web import jsonrpc
 
-from core.log import logger
+from heisen.core.log import logger
 # from core.manager.initialize_functions import initial_executer
-from rpc import app_loader
+from heisen.rpc import app_loader
 
 
 class CoreServices(jsonrpc.JSONRPC):

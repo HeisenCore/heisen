@@ -10,8 +10,8 @@ import logging.handlers
 import warnings
 from functools import partial
 
-from core.utils.singleton import Singleton
-from config import settings
+from heisen.core.utils.singleton import Singleton
+from heisen.config import settings
 
 
 class FormatterWithContextForException(logging.Formatter):

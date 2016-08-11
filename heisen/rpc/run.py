@@ -6,8 +6,8 @@ from twisted.python import log
 from twisted.cred.checkers import FilePasswordDB
 from txjsonrpc.auth import wrapResource
 
-from config import settings
-from rpc.main import CoreServices
+from heisen.config import settings
+from heisen.rpc.main import CoreServices
 
 
 def start_service():

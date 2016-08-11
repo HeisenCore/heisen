@@ -6,8 +6,8 @@ from collections import defaultdict
 
 from txjsonrpc.web import jsonrpc
 
-from core.log import logger
-from config import settings
+from heisen.core.log import logger
+from heisen.config import settings
 
 
 class App(jsonrpc.JSONRPC):

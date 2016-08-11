@@ -8,13 +8,13 @@ from twisted.internet.threads import deferToThreadPool
 from cerberus import ValidationError
 import import_string
 
-from config.settings import APP_NAME
-from config.settings import LOG_REQUEST
-from config.settings import VALIDATOR_CLASS
+from heisen.config.settings import APP_NAME
+from heisen.config.settings import LOG_REQUEST
+from heisen.config.settings import VALIDATOR_CLASS
 
-from core.log import logger
+from heisen.core.log import logger
 # from core.db import cursor_local
-from core.threading_pool.core_thread import get_twisted_pool as pool
+from heisen.core.threading_pool.core_thread import get_twisted_pool as pool
 
 
 class PluginBase(object):

@@ -1,1 +1,1 @@
-from core.mail.mail import Email
+from heisen.core.mail.mail import Email

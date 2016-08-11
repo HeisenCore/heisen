@@ -6,8 +6,8 @@ from email.utils import parseaddr, formataddr
 from jinja2 import Environment, FileSystemLoader
 import smtplib
 
-from core import toLog
-from config import settings
+from heisen.core.log import logger
+from heisen.config import settings
 
 
 class Email(object):

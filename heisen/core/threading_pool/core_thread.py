@@ -5,10 +5,10 @@ from Queue import Queue
 from threading import Thread
 from twisted.python.threadpool import ThreadPool
 
-from config.settings import BACKGROUND_PROCESS_THREAD_POOL
-from config.settings import MAIN_MIN_THREAD as min_t
-from config.settings import MAIN_MAX_THREAD as max_t
-from core.log import logger
+from heisen.config.settings import BACKGROUND_PROCESS_THREAD_POOL
+from heisen.config.settings import MAIN_MIN_THREAD as min_t
+from heisen.config.settings import MAIN_MAX_THREAD as max_t
+from heisen.core.log import logger
 
 
 class Worker(Thread):

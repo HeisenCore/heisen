@@ -31,7 +31,7 @@ class App(CliffApp):
 
 class Run(Command):
     def take_action(self, parsed_args):
-        from rpc.run import start_service
+        from heisen.rpc.run import start_service
         start_service()
 
 
@@ -39,7 +39,7 @@ class Stop(Command):
     def take_action(self, parsed_args):
         from jsonrpclib import Server
         from socket import error
-        from config.settings import RPC_PORT
+        from heisen.config.settings import RPC_PORT
 
         try:
             conn = Server('http://rostamkhAn!shoja:p4ssw0rdVahdaTi@localhost:{0}'.format(RPC_PORT))

@@ -1,5 +1,5 @@
-from mongodb import MongoDatabases
-from config.settings import DATABASES
+from heisen.mongodb import MongoDatabases
+from heisen.config.settings import DATABASES
 
 
 db = MongoDatabases()

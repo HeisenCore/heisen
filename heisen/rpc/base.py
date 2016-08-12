@@ -27,12 +27,12 @@ class RPCBase(object):
     def run(self):
         pass
 
-    def __init__(self):
+    def __init__(self, rpc_name=None):
+        self.name = rpc_name
         if self.write_activity:
             self.call.__func__.with_activity_log = True
 
     def call(self, *args, **kwargs):
-        self.func_name = self.__full_name__
         self.username = kwargs.pop('rpc_username', None)
         self.src = kwargs.pop('rpc_address', None)
         time_start = time.time()
@@ -79,7 +79,7 @@ class RPCBase(object):
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
         msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s - func: {4} - args: {5} - kwargs: {6}"
-        msg = msg.format(self.src, self.username, start_time, te-ts, self.func_name, args, kwargs)
+        msg = msg.format(self.src, self.username, start_time, te-ts, self.name, args, kwargs)
         logger.request(msg)
 
         return result
@@ -89,11 +89,11 @@ class RPCBase(object):
             return result
 
         doc = {
-            'created_date':  datetime.datetime.now(),
+            'created_date': datetime.datetime.now(),
             'username': self.username,
-            'api_name': self.func_name,
+            'api_name': self.name,
             'address': self.src,
-            'action': getattr(self, 'activity_name', self.func_name),
+            'action': getattr(self, 'activity_name', self.name),
             'args': args,
         }
 

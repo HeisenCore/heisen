@@ -34,7 +34,7 @@ def load_apps(app_dir):
             if method_name.startswith('__init__'):
                 continue
 
-            if not method_name.endswith('py'): # only load py files, refactor later for pyc and so files
+            if not method_name.endswith('py'):  # only load py files, refactor later for pyc and so files
                 continue
 
             file = None
@@ -76,8 +76,11 @@ def load_apps(app_dir):
 
 def load_all_apps():
     all_apps = {}
+
     for app_dir in settings.APP_DIRS:
         all_apps.update(load_apps(app_dir))
 
+    if 'apps' in os.listdir(os.getcwd()):
+        all_apps.update(load_apps(join(os.getcwd(), 'apps')))
 
     return all_apps

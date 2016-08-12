@@ -8,6 +8,7 @@ from txjsonrpc.auth import wrapResource
 
 from heisen.config import settings
 from heisen.rpc.main import CoreServices
+from heisen.rpc.loader import load_projects
 
 
 def start_service():
@@ -17,6 +18,7 @@ def start_service():
 
 def start_reactor():
     init = CoreServices()
+    load_projects(init)
     observer = log.PythonLoggingObserver()
     observer.start()
     checker = FilePasswordDB(settings.BASE_DIR + "/config/passwd.db")

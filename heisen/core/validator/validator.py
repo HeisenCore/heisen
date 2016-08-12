@@ -1,5 +1,6 @@
 import re
 
+from bson.regex import Regex
 from cerberus import Validator as DefaultValidator
 from cerberus import errors
 

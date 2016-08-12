@@ -17,7 +17,7 @@ from heisen.core.log import logger
 from heisen.core.threading_pool.core_thread import get_twisted_pool as pool
 
 
-class PluginBase(object):
+class RPCBase(object):
     __metaclass__ = abc.ABCMeta
     write_activity = True
     async = True

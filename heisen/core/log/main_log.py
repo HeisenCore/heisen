@@ -59,8 +59,8 @@ class Logger(object):
     }
 
     def __init__(self):
-        def log(logger, message):
-            logger.info(str(message))
+        if not hasattr(settings, 'LOGGERS'):
+            return
 
         for logger_name, logger_config in settings.LOGGERS.items():
             logger = self.setup(
@@ -73,6 +73,12 @@ class Logger(object):
             getattr(self, logger_name)(
                 '--- Starting {} Logs ---'.format(logger_name.capitalize())
             )
+
+    def __getattr__(self, name):
+        if not hasattr(settings, 'LOGGERS'):
+            return partial(logging.info)
+        else:
+            return super(Connection, self).__getattr__(name)
 
     def exception(self, message='', logger='error'):
         getattr(self, logger)(
@@ -99,6 +105,7 @@ class Logger(object):
             )
         except IOError:
             warnings.warn('Could not log to specified location, using StreamHandler')
+            print 'Could not log to specified location, using StreamHandler'
             handler = logging.StreamHandler()
 
         formatter = FormatterWithContextForException(
@@ -108,6 +115,7 @@ class Logger(object):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+        logger.propagate = False
         filter = FilterWithAbsoluteModuleName()
         logger.addFilter(filter)
 

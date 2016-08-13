@@ -5,10 +5,10 @@ from json import loads
 
 import pytz
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+HEISEN_BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 LOCAL_TZ = pytz.timezone('Asia/Tehran')
 RPC_PORT = 7089
-APP_NAME = 'app'
+APP_NAME = 'heisen'
 
 DEBUG = True
 
@@ -79,8 +79,3 @@ DATABASES = {
         'log_results': False,
     },
 }
-
-try:
-    from settings_local import *
-except ImportError:
-    pass

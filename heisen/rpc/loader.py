@@ -10,26 +10,6 @@ from heisen.core.log import logger
 from heisen.config import settings
 
 
-def load_projects(rpc_class):
-    heisen_apps = Project(settings.BASE_DIR)
-    all_apps = heisen_apps.apps
-
-    main_app = Project(os.getcwd())
-    all_apps.update(main_app.apps)
-
-    for component, klass in all_apps.items():
-        try:
-            rpc_class.putSubHandler(component, klass)
-        except Exception as e:
-            logger.exception(e, 'service')
-            logger.service("App {} failed to register".format(component))
-
-    methods = []
-    methods.extend(heisen_apps.methods)
-    methods.extend(main_app.methods)
-    rpc_class.methods = sorted(methods)
-
-
 class Application(jsonrpc.JSONRPC):
     def set_methods(self, methods):
         for method_name, method_class in methods.items():
@@ -50,6 +30,7 @@ class Project(object):
         self.apps = {}
         self.methods = []
 
+        self._load_config()
         self._find_apps()
         self._load_apps()
         self._attach_sub_handlers()
@@ -115,18 +96,42 @@ class Project(object):
 
     def _attach_sub_handlers(self):
         for full_app_name, app_class in self.apps.items():
-            parts = full_app_name.split('.')
+            parts = full_app_name.rpartition('.')
 
-            if len(parts) > 1:
-                parent = parts[-2]
+            if parts[0] and parts[1]:
+                parent = parts[0]
                 child = parts[-1]
 
                 logger.service('Adding sub handler {} to {}'.format(child, parent))
-                self.apps[parent].set_sub_handler(child, self.apps[child])
+                self.apps[parent].set_sub_handler(child, self.apps[full_app_name])
 
+    def _load_config(self):
+        module = self._load_module('settings_global', join(self.project_dir, 'config'))
 
-    def get_config(self):
-        pass
+        if module is not None:
+            settings.add_settings(module)
 
     def get_inits(self):
         pass
+
+
+def load_projects(rpc_class):
+    all_apps = {}
+    all_apps.update(heisen_app.apps)
+    all_apps.update(main_app.apps)
+
+    for component, klass in all_apps.items():
+        try:
+            rpc_class.putSubHandler(component, klass)
+        except Exception as e:
+            logger.exception(e, 'service')
+            logger.service("App {} failed to register".format(component))
+
+    methods = []
+    methods.extend(heisen_app.methods)
+    methods.extend(main_app.methods)
+    rpc_class.methods = sorted(methods)
+
+
+heisen_app = Project(settings.BASE_DIR)
+main_app = Project(os.getcwd())

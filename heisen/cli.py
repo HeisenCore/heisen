@@ -11,7 +11,7 @@ from cliff.command import Command
 class App(CliffApp):
     def __init__(self, manager):
         super(App, self).__init__(
-            description='cliff demo app',
+            description='Heisen Cli Interface',
             version='0.1',
             command_manager=manager,
             deferred_help=True,

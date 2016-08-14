@@ -27,7 +27,7 @@ requirements = [
     'pytz==2016.6.1',
     'Twisted==16.3.0',
     'txJSON_RPC==0.4.3',
-    'jsonrpclib-pelix==0.2.8',
+    'jsonrpclib==0.1.8',
 ]
 
 test_requirements = [
@@ -56,7 +56,7 @@ setup(
     install_requires=requirements,
     dependency_links=[
         'https://github.com/k1-hedayati/txjsonrpc/tarball/master#egg=txJSON_RPC-0.4.3',
-        'https://github.com/k1-hedayati/jsonrpclib/tarball/master#egg=jsonrpclib-pelix-0.2.8',
+        'https://github.com/k1-hedayati/jsonrpclib/tarball/master#egg=jsonrpclib-0.1.8',
     ],
     license="MIT license",
     zip_safe=False,

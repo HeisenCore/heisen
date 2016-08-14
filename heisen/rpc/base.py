@@ -76,8 +76,8 @@ class RPCBase(object):
         te = time.time()
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
-        msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s - func: {4} - args: {5} - kwargs: {6}"
-        msg = msg.format(self.src, self.username, start_time, te-ts, self.name, args, kwargs)
+        msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s - func: {4} - args: {5} - kwargs: {6} - result: {7}"
+        msg = msg.format(self.src, self.username, start_time, te-ts, self.name, args, kwargs, result)
         logger.request(msg)
 
         return result

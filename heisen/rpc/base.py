@@ -8,9 +8,7 @@ from twisted.internet.threads import deferToThreadPool
 from cerberus import ValidationError
 import import_string
 
-from heisen.config.settings import APP_NAME
-from heisen.config.settings import LOG_REQUEST
-from heisen.config.settings import VALIDATOR_CLASS
+from heisen.config import settings
 
 from heisen.core.log import logger
 # from core.db import cursor_local
@@ -63,7 +61,7 @@ class RPCBase(object):
 
         args_dict = dict(zip(method_args, args))
 
-        validator_class = import_string(VALIDATOR_CLASS)
+        validator_class = import_string(settings.VALIDATOR_CLASS)
         validator = validator_class(allow_unknown=True)
         valid = validator.validate(args_dict, self.schema)
 
@@ -72,7 +70,7 @@ class RPCBase(object):
 
 
     def _timeit(self, result, ts, args, kwargs):
-        if not LOG_REQUEST:
+        if not settings.LOG_REQUEST:
             return result
 
         te = time.time()

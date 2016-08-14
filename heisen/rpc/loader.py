@@ -30,7 +30,9 @@ class Project(object):
         self.apps = {}
         self.methods = []
 
-        self._load_config()
+        if self.project_dir != settings.HEISEN_BASE_DIR:
+            self._load_config()
+
         self._find_apps()
         self._load_apps()
         self._attach_sub_handlers()
@@ -106,7 +108,7 @@ class Project(object):
                 self.apps[parent].set_sub_handler(child, self.apps[full_app_name])
 
     def _load_config(self):
-        module = self._load_module('settings_global', join(self.project_dir, 'config'))
+        module = self._load_module('settings', join(self.project_dir, 'config'))
 
         if module is not None:
             settings.add_settings(module)
@@ -133,5 +135,5 @@ def load_projects(rpc_class):
     rpc_class.methods = sorted(methods)
 
 
-heisen_app = Project(settings.BASE_DIR)
+heisen_app = Project(settings.HEISEN_BASE_DIR)
 main_app = Project(os.getcwd())

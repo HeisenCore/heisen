@@ -22,13 +22,14 @@ class FormatterWithContextForException(logging.Formatter):
         if inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
             frame_locals = inspect.getinnerframes(tback)[-1][0].f_locals
 
+        frame_locals.pop('__builtins__', None)
         return pprint.pformat(frame_locals) + '\n' + ''.join(traceback.format_exception(_type, value, tback))
 
 
 class FilterWithAbsoluteModuleName(logging.Filter):
     def filter(self, record):
         record.absoluteModuleName = record.pathname.replace('.py', '', 1)\
-                                                   .replace(settings.BASE_DIR, '', 1)\
+                                                   .replace(settings.HEISEN_BASE_DIR, '', 1)\
                                                    .replace('/', '.')\
                                                    .lstrip('.')
 
@@ -44,6 +45,10 @@ def getExceptionText():
 
     if inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
         frame_locals = inspect.getinnerframes(tback)[-1][0].f_locals
+
+    for var in frame_locals.keys():
+        if var.startswith('__'):
+            frame_locals.pop(var)
 
     text = pprint.pformat(frame_locals)
     text += '\n'

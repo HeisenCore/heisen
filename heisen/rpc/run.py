@@ -21,9 +21,17 @@ def start_reactor():
     load_projects(init)
     observer = log.PythonLoggingObserver()
     observer.start()
-    checker = FilePasswordDB(settings.BASE_DIR + "/config/passwd.db")
+
+    checker = FilePasswordDB(settings.HEISEN_BASE_DIR + "/config/passwd.db")
     realm_name = "Server Name: {}".format(settings.APP_NAME)
     wrappedRoot = wrapResource(init, [checker], realmName=realm_name)
     reactor.listenTCP(settings.RPC_PORT, server.Site(resource=wrappedRoot))
     reactor.suggestThreadPoolSize(settings.BACKGROUND_PROCESS_THREAD_POOL)
+
     reactor.run(installSignalHandlers=False)
+
+
+    import base64
+    auth = base64.encodestring(urllib.unquote('aliehsanmilad:Key1_s!3cr3t')).strip()
+    auth = string.join(string.split(auth), "")
+    extra_headers = [("Authorization", "Basic " + auth)]

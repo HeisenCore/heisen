@@ -5,9 +5,7 @@ from Queue import Queue
 from threading import Thread
 from twisted.python.threadpool import ThreadPool
 
-from heisen.config.settings import BACKGROUND_PROCESS_THREAD_POOL
-from heisen.config.settings import MAIN_MIN_THREAD as min_t
-from heisen.config.settings import MAIN_MAX_THREAD as max_t
+from heisen.config import settings
 from heisen.core.log import logger
 
 
@@ -55,7 +53,7 @@ class ThreadPoolPython:
 
 
 def get_pool():
-    pool = ThreadPoolPython(BACKGROUND_PROCESS_THREAD_POOL)
+    pool = ThreadPoolPython(settings.BACKGROUND_PROCESS_THREAD_POOL)
     return pool
 
 
@@ -66,7 +64,11 @@ def get_twisted_pool():
         return pool
 
     except:
-        pool = ThreadPool(minthreads=min_t, maxthreads=max_t, name='core')
+        pool = ThreadPool(
+            minthreads=settings.MAIN_MIN_THREAD,
+            maxthreads=settings.MAIN_MAX_THREAD,
+            name='core'
+        )
         pool.start()
         reactor.addSystemEventTrigger('after', 'shutdown', pool.stop)
         return pool

@@ -3,6 +3,8 @@
 
 import sys
 
+from heisen.config import settings
+from heisen.core.log import logger
 from cliff.app import App as CliffApp
 from cliff.commandmanager import CommandManager
 from cliff.command import Command
@@ -31,18 +33,22 @@ class App(CliffApp):
 
 class Run(Command):
     def take_action(self, parsed_args):
-        from heisen.rpc.run import start_service
-        start_service()
+        try:
+            from heisen.rpc.run import start_service
+            start_service()
+        except Exception as e:
+            print 'Exiting with exception', e, 'Check logs for more info'
+            logger.exception(e)
 
 
 class Stop(Command):
     def take_action(self, parsed_args):
         from jsonrpclib import Server
         from socket import error
-        from heisen.config.settings import RPC_PORT
+        from heisen.config import settings
 
         try:
-            conn = Server('http://rostamkhAn!shoja:p4ssw0rdVahdaTi@localhost:{0}'.format(RPC_PORT))
+            conn = Server('http://rostamkhAn!shoja:p4ssw0rdVahdaTi@localhost:{0}'.format(settings.RPC_PORT))
             conn.main.stop()
 
         except error:

@@ -1,10 +1,17 @@
-from txjsonrpc.web import jsonrpc
+from txjsonrpc.web.jsonrpc import JSONRPC
 
 from heisen.rpc import loader
+from heisen.config import settings
+from heisen.core.log import logger
 
 
-class CoreServices(jsonrpc.JSONRPC):
+class CoreServices(JSONRPC):
     # reactor.callInThread(initial_executer, )
+
+    def __init__(self):
+        JSONRPC.__init__(self)
+        self.logger = logger
+        self.app_name = settings.APP_NAME
 
     def jsonrpc_methodHelp(self, method):
         method = self._getFunction(method)

@@ -4,9 +4,8 @@ from pymongo import MongoClient
 from pymongo import ReadPreference
 from pymongo import monitoring
 
-from heisen.config.settings import DATABASES
-from heisen.core.log import logger
 from heisen.config import settings
+from heisen.core.log import logger
 from heisen.core.utils.singleton import Singleton
 
 
@@ -109,8 +108,7 @@ class MongoConnection(object):
         pass
 
 
-@Singleton
 class MongoDatabases(object):
     def __init__(self):
-        for database in DATABASES.keys():
+        for database in settings.DATABASES.keys():
             setattr(self, database, MongoConnection(database).get_cursor())

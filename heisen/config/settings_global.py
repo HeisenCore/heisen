@@ -26,7 +26,7 @@ ACTIVITY_LOG_DATABASE = 'default'
 
 VALIDATOR_CLASS = 'core.validator.validator.Validator'
 
-LOG_DIR = '/var/log/core/'
+LOG_DIR = '/var/log/heisen/'
 LOG_MAX_BYTES = 1000000
 LOG_BACKUP_COUNT = 10
 LOG_REQUEST = True

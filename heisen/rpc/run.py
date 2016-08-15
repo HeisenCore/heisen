@@ -29,9 +29,3 @@ def start_reactor():
     reactor.suggestThreadPoolSize(settings.BACKGROUND_PROCESS_THREAD_POOL)
 
     reactor.run(installSignalHandlers=False)
-
-
-    import base64
-    auth = base64.encodestring(urllib.unquote('aliehsanmilad:Key1_s!3cr3t')).strip()
-    auth = string.join(string.split(auth), "")
-    extra_headers = [("Authorization", "Basic " + auth)]

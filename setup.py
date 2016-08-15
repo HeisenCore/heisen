@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
-from pip.req import parse_requirements
+from setuptools import setup, find_packages
+
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -27,7 +27,8 @@ requirements = [
     'pytz==2016.6.1',
     'Twisted==16.3.0',
     'txJSON_RPC==0.4.3',
-    'jsonrpclib==0.1.8',
+    'jsonrpclib==0.1.9',
+    'cython==0.24.1',
 ]
 
 test_requirements = [
@@ -42,11 +43,8 @@ setup(
     author="Keyvan Hedayati",
     author_email='k1.hedayati93@gmail.com',
     url='https://github.com/k1-hedayati/heisen',
-    packages=[
-        'heisen',
-    ],
-    package_dir={'heisen':
-                 'heisen'},
+    packages=find_packages(),
+    package_dir={'heisen': 'heisen'},
     entry_points={
         'console_scripts': [
             'heisen=heisen.cli:main'
@@ -56,7 +54,7 @@ setup(
     install_requires=requirements,
     dependency_links=[
         'https://github.com/k1-hedayati/txjsonrpc/tarball/master#egg=txJSON_RPC-0.4.3',
-        'https://github.com/k1-hedayati/jsonrpclib/tarball/master#egg=jsonrpclib-0.1.8',
+        'https://github.com/k1-hedayati/jsonrpclib/tarball/master#egg=jsonrpclib-0.1.9',
     ],
     license="MIT license",
     zip_safe=False,

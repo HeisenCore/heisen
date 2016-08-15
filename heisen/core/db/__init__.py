@@ -1,4 +1,4 @@
-from heisen.mongodb import MongoDatabases
+from heisen.core.db.mongodb import MongoDatabases
 
 
 db = MongoDatabases()

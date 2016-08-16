@@ -24,7 +24,7 @@ AP_DATABASE = 'default'
 
 ACTIVITY_LOG_DATABASE = 'default'
 
-VALIDATOR_CLASS = 'core.validator.validator.Validator'
+VALIDATOR_CLASS = 'heisen.core.validator.validator.Validator'
 
 LOG_DIR = '/var/log/heisen/'
 LOG_MAX_BYTES = 1000000

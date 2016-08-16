@@ -79,3 +79,9 @@ DATABASES = {
         'log_results': False,
     },
 }
+
+RPC_SERVERS = {
+    'self': [
+        ('127.0.0.1', RPC_PORT, 'aliehsanmilad', 'Key1_s!3cr3t')
+    ],
+}

@@ -10,33 +10,24 @@ import logging.handlers
 import warnings
 from functools import partial
 
-from heisen.core.utils.singleton import Singleton
 from heisen.config import settings
 
 
 class FormatterWithContextForException(logging.Formatter):
     def formatException(self, exc_info):
-        (_type, value, tback) = exc_info
-
-        frame_locals = {}
-        if inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
-            frame_locals = inspect.getinnerframes(tback)[-1][0].f_locals
-
-        frame_locals.pop('__builtins__', None)
-        return pprint.pformat(frame_locals) + '\n' + ''.join(traceback.format_exception(_type, value, tback))
+        return format_exception()
 
 
 class FilterWithAbsoluteModuleName(logging.Filter):
     def filter(self, record):
-        record.absoluteModuleName = record.pathname.replace('.py', '', 1)\
-                                                   .replace(settings.HEISEN_BASE_DIR, '', 1)\
-                                                   .replace('/', '.')\
-                                                   .lstrip('.')
+        absoluteModuleName = record.pathname.replace('.py', '', 1).replace(settings.HEISEN_BASE_DIR, '', 1).replace('/', '.').lstrip('.')
+
+        record.absoluteModuleName = absoluteModuleName
 
         return True
 
 
-def getExceptionText():
+def format_exception():
     """
         create and return text of last exception
     """
@@ -56,7 +47,6 @@ def getExceptionText():
     return text
 
 
-@Singleton
 class Logger(object):
     formats = {
         'basic': '%(asctime)s - %(message)s',
@@ -65,6 +55,7 @@ class Logger(object):
 
     def __init__(self):
         if not hasattr(settings, 'LOGGERS'):
+            print '*** No loggers found ***'
             return
 
         for logger_name, logger_config in settings.LOGGERS.items():
@@ -83,11 +74,11 @@ class Logger(object):
         if not hasattr(settings, 'LOGGERS'):
             return partial(logging.info)
         else:
-            return super(Connection, self).__getattr__(name)
+            return super(Logger, self).__getattr__(name)
 
     def exception(self, message='', logger='error'):
         getattr(self, logger)(
-            '{}\n{}'.format(str(message), getExceptionText())
+            '{}\n{}'.format(str(message), format_exception())
         )
 
     def setup(self, logger_name, logger_format, logger_level):
@@ -110,7 +101,7 @@ class Logger(object):
             )
         except IOError:
             warnings.warn('Could not log to specified location, using StreamHandler')
-            print 'Could not log to specified location, using StreamHandler'
+            print '*********** Could not log to specified location, using StreamHandler ***********'
             handler = logging.StreamHandler()
 
         formatter = FormatterWithContextForException(

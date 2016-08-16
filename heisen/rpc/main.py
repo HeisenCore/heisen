@@ -1,4 +1,5 @@
 from txjsonrpc.web.jsonrpc import JSONRPC
+from txjsonrpc import jsonrpclib
 
 from heisen.rpc import loader
 from heisen.config import settings
@@ -19,3 +20,20 @@ class CoreServices(JSONRPC):
 
     def jsonrpc_list_methods(self):
         return self.methods
+
+    def _ebRender(self, failure, id):
+        if isinstance(failure.value, jsonrpclib.Fault):
+            return failure.value
+
+        # log.err(failure)
+
+        message = failure.value.message
+        code = self._map_exception(type(failure.value))
+        logger.error(failure.getTraceback())
+
+        message = '{}|{}'.format(
+            failure.type.__name__,
+            failure.getErrorMessage()
+        )
+
+        return jsonrpclib.Fault(code, message)

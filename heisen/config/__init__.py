@@ -13,7 +13,6 @@ class Settings(object):
 
     def add_settings(self, module):
         for config in dir(module):
-            print config
             if config == 'LOGGERS' and hasattr(self, 'LOGGERS'):
                 self.LOGGERS.update(module.LOGGERS)
             elif config in os.environ:

@@ -1,6 +1,6 @@
 import zmq
 
-from core.log import logger
+from heisen.core.log import logger
 from heisen.config import settings
 from heisen.rpc.base import RPCBase
 

@@ -16,7 +16,11 @@ class Settings(object):
             if config == 'LOGGERS' and hasattr(self, 'LOGGERS'):
                 self.LOGGERS.update(module.LOGGERS)
             elif config in os.environ:
-                setattr(self, config, os.environ[config])
+                try:
+                    setattr(self, config, int(os.environ[config]))
+                except Exception as e:
+                    setattr(self, config, os.environ[config])
+                    print e
             elif config.isupper():
                 setattr(self, config, getattr(module, config))
 

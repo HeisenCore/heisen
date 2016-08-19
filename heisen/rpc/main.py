@@ -6,7 +6,7 @@ from heisen.config import settings
 from heisen.core.log import logger
 
 
-class CoreServices(JSONRPC):
+class Main(JSONRPC):
     # reactor.callInThread(initial_executer, )
 
     def __init__(self):

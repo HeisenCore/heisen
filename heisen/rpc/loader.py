@@ -4,6 +4,7 @@ import os
 from os.path import join, getsize
 from collections import defaultdict
 
+from twisted.internet import reactor
 from txjsonrpc.web import jsonrpc
 
 from heisen.core.log import logger
@@ -33,6 +34,7 @@ class Project(object):
         self._find_apps()
         self._load_apps()
         self._attach_sub_handlers()
+        self._run_inits()
 
     def _find_apps(self):
         for dir_name, dirs, methods in os.walk(self.base_app_dir):
@@ -104,8 +106,17 @@ class Project(object):
                 logger.service('Adding sub handler {} to {}'.format(child, parent))
                 self.apps[parent].set_sub_handler(child, self.apps[full_app_name])
 
-    def get_inits(self):
-        pass
+    def _run_inits(self):
+        for app_dir in self.app_dirs:
+            init = self._load_module('init', app_dir)
+            try:
+                logger.debug(
+                    reactor.addSystemEventTrigger('after', 'startup', init.init)
+                )
+            except AttributeError:
+                pass
+            except Exception as e:
+                logger.exception(e)
 
 
 def load_projects(rpc_class):

@@ -76,7 +76,7 @@ class SharedMemory(object):
         if func in self.signaling_funcs:
             name = func.func_name
             msg = "'{}' function exist's in the signal list.".format(name)
-            toLog(msg, 'error')
+            logger.error(msg)
         else:
             self.signaling_funcs.append(func)
 

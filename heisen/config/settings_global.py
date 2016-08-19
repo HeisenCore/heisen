@@ -61,7 +61,7 @@ LOGGERS = {
     },
     'twisted': {
         'format':'basic',
-        'level': logging.ERROR
+        'level': logging.DEBUG
     },
     'py.warnings': {
         'format':'basic',
@@ -80,8 +80,17 @@ DATABASES = {
     },
 }
 
-RPC_SERVERS = {
-    'self': [
-        ('127.0.0.1', RPC_PORT, 'aliehsanmilad', 'Key1_s!3cr3t')
-    ],
-}
+PUB_PORT = 5556
+PUB_REP_HOST = '127.0.0.1'
+REP_PORT = 5575
+TOPICS = [
+    'shared_memory',
+    'controler',
+    'signaling'
+]
+WAIT_MEMBER = 3
+HEARTBEAT_TIME = 300
+
+START_ZMQ = 1
+PUB_SERVER_PORT = 5556
+REP_SERVER_PORT = 5575

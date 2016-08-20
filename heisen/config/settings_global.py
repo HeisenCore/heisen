@@ -55,13 +55,17 @@ LOGGERS = {
         'format':'complete',
         'level': logging.INFO
     },
+    'zmq': {
+        'format':'basic',
+        'level': logging.INFO
+    },
     'apscheduler': {
         'format':'basic',
         'level': logging.DEBUG
     },
     'twisted': {
         'format':'basic',
-        'level': logging.DEBUG
+        'level': logging.ERROR
     },
     'py.warnings': {
         'format':'basic',

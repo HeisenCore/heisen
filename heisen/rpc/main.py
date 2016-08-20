@@ -14,7 +14,7 @@ class Main(JSONRPC):
         self.logger = logger
         self.app_name = settings.APP_NAME
 
-    def jsonrpc_methodHelp(self, method):
+    def jsonrpc_help(self, method):
         method = self._getFunction(method)
         return getattr(method.im_class, 'documentation', '')
 

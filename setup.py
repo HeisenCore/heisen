@@ -42,7 +42,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author="Keyvan Hedayati",
     author_email='k1.hedayati93@gmail.com',
-    url='https://github.com/k1-hedayati/heisen',
+    url='https://github.com/HeisenCore/heisen',
     packages=find_packages(),
     package_dir={'heisen': 'heisen'},
     entry_points={
@@ -53,8 +53,8 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     dependency_links=[
-        'https://github.com/k1-hedayati/txjsonrpc/tarball/master#egg=txJSON_RPC_heisen-0.4.4',
-        'https://github.com/k1-hedayati/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.11',
+        'https://github.com/HeisenCore/txjsonrpc/tarball/master#egg=txJSON_RPC_heisen-0.4.4',
+        'https://github.com/HeisenCore/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.11',
     ],
     license="MIT license",
     zip_safe=False,

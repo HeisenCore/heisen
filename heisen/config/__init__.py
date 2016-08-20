@@ -7,7 +7,11 @@ class Settings(object):
     def __init__(self):
         self.add_settings(settings_global)
 
-        app_settings = import_module(os.environ.get('HEISEN_SETTINGS_MODULE'))
+        module_name = os.environ.get('HEISEN_SETTINGS_MODULE', '')
+        if not module_name:
+            return
+
+        app_settings = import_module(module_name)
 
         self.add_settings(app_settings)
 

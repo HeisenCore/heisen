@@ -1,12 +1,12 @@
 import datetime
 import time
-import zmq
-
+import socket
 from base64 import b64encode
 from os import urandom
 
 from bson.json_util import dumps as bson_dumps
 from bson.json_util import loads as bson_loads
+import zmq
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThread
@@ -25,7 +25,7 @@ def process(func):
             lock = args[0].lock_time + datetime.timedelta(seconds=settings.WAIT_MEMBER)
             if now < lock:
                 time.sleep(settings.WAIT_MEMBER)
-                logger.object(
+                logger.zmq(
                     'Lock time: {0} | {1} | {2}'.format(
                         args[0].member_name,
                         args[1:],
@@ -33,6 +33,7 @@ def process(func):
                     )
                 )
         return func(*args, **kwargs)
+
     return execute
 
 
@@ -43,10 +44,10 @@ class SharedMemory(object):
         self.lock_time = None
         self.signaling_funcs = []
 
-        self.pub_sub_port = settings.PUB_PORT
         self.pub_sub_host = settings.PUB_REP_HOST
-        self.rep_req_port = settings.REP_PORT
+        self.pub_sub_port = settings.PUB_PORT
         self.rep_req_host = settings.PUB_REP_HOST
+        self.rep_req_port = settings.REP_PORT
 
         # Initiate consumer data listener
         self.topics = {}
@@ -86,15 +87,22 @@ class SharedMemory(object):
             'member_name': self.member_name,
             'alive': True,
             'new_member': True,
-            'host': settings.CORE_HOST_SELF,
-            'port': settings.CORE_PORT
+            'host': self._get_host_ip(),
+            'port': settings.RPC_PORT
             # 'sync': True,  # evaluate after instantiate
         }
         if not new_member:
             info['new_member'] = False
 
         self.send_msg('register', 'controler', info)
-        logger.object('Sending info: {0}'.format(info))
+        logger.zmq('Sending info: {0}'.format(info))
+
+    def _get_host_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((self.pub_sub_host, self.pub_sub_port))
+        address = s.getsockname()[0]
+
+        return address
 
     def register_members(self, info):
         members_name = []
@@ -105,7 +113,7 @@ class SharedMemory(object):
             self.registry.append(info)
             self.lock_time = datetime.datetime.now()
             self.send_info(new_member=False)
-            logger.object('Receive & Rgister: {0}'.format(info))
+            logger.zmq('Receive & Rgister: {0}'.format(info))
 
         self.send_synchronizer()
 
@@ -120,7 +128,7 @@ class SharedMemory(object):
                         member['alive'] = False
                 except:
                     member['alive'] = False
-            logger.object('Heartbeat checking Done... .')
+            logger.zmq('Heartbeat checking Done... .')
 
     def send_synchronizer(self):
         self.registry.sort(
@@ -155,7 +163,7 @@ class SharedMemory(object):
             if result.get('result', None):
                 self.alter_member(member[2])
 
-        logger.object("Synchronizer result: {0}".format(result))
+        logger.zmq("Synchronizer result: {0}".format(result))
 
     def alter_member(self, member_name):
         self.send_msg('alter_member', 'controler', member_name)
@@ -187,7 +195,7 @@ class SharedMemory(object):
         return getattr(self, attr)
 
     def __sync_subscribe(self):
-        logger.object('Start subscriber')
+        logger.zmq('Start subscriber')
         context = zmq.Context()
 
         for key in self.topics.keys():
@@ -198,7 +206,7 @@ class SharedMemory(object):
             self.topics[key].setsockopt(zmq.SUBSCRIBE, key)
             worker_sub = deferToThread(self.infinity_loop, self.topics[key])
 
-            logger.object("Start subscriber {0}...... .".format(key))
+            logger.zmq("Start subscriber {0}...... .".format(key))
             worker_sub.addErrback(to_log_error)
 
     def infinity_loop(self, obj):
@@ -256,6 +264,7 @@ class SharedMemory(object):
 
         msg = "{0}{1}{2}".format(args[1], self.sign, dumps(arg))
         self.send_socket.send(msg)
+        logger.zmq('Sending..')
         self.send_socket.recv()
 
 

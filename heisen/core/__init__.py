@@ -15,4 +15,3 @@ def get_rpc_connection():
 
 
 rpc_call = get_rpc_connection()
-# logger.debug(rpc_call.self.list_methods())

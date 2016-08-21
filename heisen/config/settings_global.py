@@ -55,13 +55,17 @@ LOGGERS = {
         'format':'complete',
         'level': logging.INFO
     },
+    'zmq': {
+        'format':'basic',
+        'level': logging.INFO
+    },
     'apscheduler': {
         'format':'basic',
         'level': logging.DEBUG
     },
     'twisted': {
         'format':'basic',
-        'level': logging.DEBUG
+        'level': logging.ERROR
     },
     'py.warnings': {
         'format':'basic',
@@ -80,9 +84,12 @@ DATABASES = {
     },
 }
 
-PUB_PORT = 5556
-PUB_REP_HOST = '127.0.0.1'
-REP_PORT = 5575
+ZMQ = {
+    'HOST': '127.0.0.1',
+    'PUB': 5556,
+    'REP': 5575
+}
+
 TOPICS = [
     'shared_memory',
     'controler',

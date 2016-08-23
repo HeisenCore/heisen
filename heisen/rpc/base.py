@@ -76,7 +76,7 @@ class RPCBase(object):
         te = time.time()
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
-        msg = "[{0}] - [{1}] - start: {2} - time: {3:2.1f}s"
+        msg = " start: {2} - [{0}] - [{1}] - time: {3:2.1f}s"
         msg += " - func: {4} - args: {5} - kwargs: {6} - result: {7}"
         msg = msg.format(
             self.src,

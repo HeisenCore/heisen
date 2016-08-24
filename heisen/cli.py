@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 
-from heisen.config import settings
-from heisen.core.log import logger
 from cliff.app import App as CliffApp
 from cliff.commandmanager import CommandManager
 from cliff.command import Command
+
+from heisen.core.log import logger
+from heisen.config import settings
+from heisen.utils.module import load_module
 
 
 class App(CliffApp):
@@ -31,39 +34,33 @@ class App(CliffApp):
             self.LOG.debug('got an error: %s', err)
 
 
-class Run(Command):
-    def take_action(self, parsed_args):
-        try:
-            from heisen.rpc.run import start_service
-            start_service()
-        except Exception as e:
-            print 'Exiting with exception', e, 'Check logs for more info'
-            logger.exception(e)
-
-
-class Stop(Command):
-    def take_action(self, parsed_args):
-        from jsonrpclib import Server
-        from socket import error
-        from heisen.config import settings
-
-        try:
-            conn = Server('http://rostamkhAn!shoja:p4ssw0rdVahdaTi@localhost:{0}'.format(settings.RPC_PORT))
-            conn.main.stop()
-
-        except error:
-            print 'Core Services shutdown \t\t\t\t\t\t[OK]'
-
-
 def main(argv=sys.argv[1:], manager=None):
-    if manager is None:
-        manager = CommandManager('')
+    manager = CommandManager('')
 
-    manager.add_command('run', Run)
-    manager.add_command('stop', Stop)
+    get_commands(settings.HEISEN_BASE_DIR, manager)
+
+    if getattr(settings, 'BASE_DIR', None):
+        get_commands(settings.BASE_DIR, manager)
+
+    # manager.add_command('run', Run)
+    # manager.add_command('stop', Stop)
     myapp = App(manager)
     return myapp.run(argv)
 
+
+def get_commands(path, manager):
+    command_dir = os.path.join(path, 'commands')
+    if not os.path.isdir(command_dir):
+        return
+
+    for command_file in os.listdir(command_dir):
+        if not command_file.endswith('.py'):
+            continue
+
+        command_name = command_file.replace('.py', '')
+        command = load_module(command_name, command_dir)
+
+        manager.add_command(command_name, command.Command)
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

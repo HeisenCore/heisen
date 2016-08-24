@@ -7,8 +7,8 @@ from heisen.core.watchdog.dog import monitor_app, monitor_heisen
 
 def start_watchdog():
     if settings.DEBUG:
-        p = Process(target=monitor_heisen)
+        p = Process(name='heisen_monitor', target=monitor_heisen)
         p.start()
 
-        p = Process(target=monitor_app)
+        p = Process(name='app_monitor', target=monitor_app)
         p.start()

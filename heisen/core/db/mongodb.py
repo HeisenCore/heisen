@@ -6,7 +6,6 @@ from pymongo import monitoring
 
 from heisen.config import settings
 from heisen.core.log import logger
-from heisen.core.utils.singleton import Singleton
 
 
 class CommandLogger(monitoring.CommandListener):

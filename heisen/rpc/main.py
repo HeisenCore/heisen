@@ -5,7 +5,7 @@ from txjsonrpc import jsonrpclib
 from heisen.rpc import loader
 from heisen.config import settings
 from heisen.core.log import logger
-
+from heisen.utils.module import load_module
 
 class Main(JSONRPC):
 
@@ -51,7 +51,7 @@ class Main(JSONRPC):
             return
 
         module_path, _, module_name = path.replace('.py', '').rpartition('/')
-        method = self.heisen_project._load_module(module_name, module_path)
+        method = load_module(module_name, module_path)
 
         if settings.HEISEN_BASE_DIR in path:
             app_path = os.path.join(settings.HEISEN_BASE_DIR, 'apps')

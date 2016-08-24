@@ -9,6 +9,7 @@ from txjsonrpc.web import jsonrpc
 
 from heisen.core.log import logger
 from heisen.config import settings
+from heisen.utils.module import load_module
 
 
 class Application(jsonrpc.JSONRPC):
@@ -56,18 +57,6 @@ class Project(object):
 
         return list(methods)
 
-    def _load_module(self, module_name, module_path):
-        file = None
-        module = None
-        try:
-            file, pathname, desc = imp.find_module(module_name, [module_path])
-            module = imp.load_module(module_name, file, pathname, desc)
-        except Exception as e:
-            logger.exception(e)
-            if file is not None:
-                file.close()
-
-        return module
 
     def _load_apps(self):
         for app_dir in self.app_dirs:
@@ -81,7 +70,7 @@ class Project(object):
             logger.service('----- Adding App {} -----'.format(full_app_name))
 
             for method_name in self._get_method_list(rpc_dir):
-                method_module = self._load_module(method_name, rpc_dir)
+                method_module = load_module(method_name, rpc_dir)
                 method_full_name = '{}.{}'.format(full_app_name, method_name)
 
                 if method_module is None:
@@ -108,7 +97,7 @@ class Project(object):
 
     def _run_inits(self):
         for app_dir in self.app_dirs:
-            init = self._load_module('init', app_dir)
+            init = load_module('init', app_dir)
             try:
                 logger.debug(
                     reactor.addSystemEventTrigger('after', 'startup', init.init)

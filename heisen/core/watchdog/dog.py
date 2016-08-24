@@ -18,12 +18,18 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         self.base_dir = kwargs.pop('base_dir', None)
         super(HeisenEventHandler, self).__init__(*args, **kwargs)
 
+    def on_created(self, event):
+        self.reload(event.src_path)
+
     def on_modified(self, event):
-        if os.path.join(self.base_dir, 'apps') not in event.src_path:
+        self.reload(event.src_path)
+
+    def reload(self, path):
+        if os.path.join(self.base_dir, 'apps') not in path:
             return
 
         try:
-            rpc_call.self.reload(event.src_path)
+            rpc_call.self.reload(path)
         except Exception as e:
             logger.exception(e)
 

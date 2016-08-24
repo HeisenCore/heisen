@@ -25,7 +25,8 @@ def start_reactor():
     observer = log.PythonLoggingObserver()
     observer.start()
 
-    checker = FilePasswordDB(settings.HEISEN_BASE_DIR + "/config/passwd.db")
+    path = settings.HEISEN_BASE_DIR + "/config/passwd.db"
+    checker = FilePasswordDB(path)
     realm_name = "Server Name: {}".format(settings.APP_NAME)
     wrappedRoot = wrapResource(main, [checker], realmName=realm_name)
     reactor.listenTCP(settings.RPC_PORT, server.Site(resource=wrappedRoot))

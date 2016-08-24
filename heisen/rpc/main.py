@@ -8,7 +8,6 @@ from heisen.core.log import logger
 
 
 class Main(JSONRPC):
-    # reactor.callInThread(initial_executer, )
 
     def __init__(self):
         JSONRPC.__init__(self)
@@ -79,8 +78,6 @@ class Main(JSONRPC):
     def _ebRender(self, failure, id):
         if isinstance(failure.value, jsonrpclib.Fault):
             return failure.value
-
-        # log.err(failure)
 
         message = failure.value.message
         code = self._map_exception(type(failure.value))

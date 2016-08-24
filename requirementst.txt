@@ -1,3 +1,4 @@
+pyzmq==15.3.0
 pymongo==3.0.3
 Jinja2==2.8
 pip==1.5.4

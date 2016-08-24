@@ -16,7 +16,7 @@ class Application(jsonrpc.JSONRPC):
         for method_name, method_class in methods.items():
             setattr(self, 'jsonrpc_{}'.format(method_name), method_class.call)
 
-    def add_method(self, method_name, method_class):
+    def set_method(self, method_name, method_class):
         setattr(self, 'jsonrpc_{}'.format(method_name), method_class.call)
 
     def set_sub_handler(self, name, klass):
@@ -90,7 +90,7 @@ class Project(object):
                 method_class = method_module.RPC(method_full_name)
 
                 logger.service('Adding method {}'.format(method_full_name))
-                application.add_method(method_name, method_class)
+                application.set_method(method_name, method_class)
                 self.methods.append(method_full_name)
 
             logger.service('----- Finished Adding App {} -----'.format(full_app_name))
@@ -120,6 +120,9 @@ class Project(object):
 
 
 def load_projects(rpc_class):
+    heisen_app = Project(settings.HEISEN_BASE_DIR)
+    main_app = Project(os.getcwd())
+
     all_apps = {}
     all_apps.update(heisen_app.apps)
     all_apps.update(main_app.apps)
@@ -135,7 +138,3 @@ def load_projects(rpc_class):
     methods.extend(heisen_app.methods)
     methods.extend(main_app.methods)
     rpc_class.methods = sorted(methods)
-
-
-heisen_app = Project(settings.HEISEN_BASE_DIR)
-main_app = Project(os.getcwd())

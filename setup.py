@@ -29,6 +29,7 @@ requirements = [
     'txJSON_RPC_heisen==0.4.4',
     'jsonrpclib_heisen==0.1.11',
     'cython==0.24.1',
+    'watchdog==0.8.3',
 ]
 
 test_requirements = [

@@ -44,7 +44,7 @@ class Main(JSONRPC):
         methods.extend(self.main_project.methods)
         methods = sorted(methods)
 
-        return self.methods
+        return methods
 
     def jsonrpc_reload(self, path):
         if not settings.DEBUG:

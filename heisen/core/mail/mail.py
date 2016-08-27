@@ -16,10 +16,11 @@ class Email(object):
         self.subject = subject
         self.content = content
 
-        self.host = settings.email_host
-        self.port = settings.email_port
-        self.user = settings.email_host_user
-        self.password = settings.email_host_password
+        if settings.EMAIL_BACKEND == 'debug':
+            self.host = settings.email_host
+            self.port = settings.email_port
+            self.user = settings.email_host_user
+            self.password = settings.email_host_password
 
         self.jinja_env = Environment(
             loader=FileSystemLoader(settings.EMAIL_TEMPLATE_DIR),
@@ -57,9 +58,9 @@ class Email(object):
     def send_email(self, receiver):
         self.msg['To'] = self._format_addr(u'<%s>' % receiver)
 
-        if settings.email_backend == 'smtp':
+        if settings.EMAIL_BACKEND == 'smtp':
             self._smtp(receiver)
-        elif settings.email_backend == 'debug':
-            toLog(self.msg.as_string(), 'debug')
+        elif settings.EMAIL_BACKEND == 'debug':
+            logger.debug(self.msg.as_string())
 
         return True

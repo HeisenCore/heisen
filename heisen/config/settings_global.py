@@ -84,6 +84,8 @@ DATABASES = {
     },
 }
 
+EMAIL_BACKEND = 'debug'
+
 ZMQ = {
     'HOST': '127.0.0.1',
     'PUB': 5556,

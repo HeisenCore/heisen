@@ -28,6 +28,9 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         if os.path.join(self.base_dir, 'apps') not in path:
             return
 
+        if 'rpc' not in path:
+            return
+
         try:
             rpc_call.self.reload(path)
         except Exception as e:

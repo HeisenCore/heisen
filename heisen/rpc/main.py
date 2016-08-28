@@ -1,3 +1,4 @@
+import inspect
 import os
 from txjsonrpc.web.jsonrpc import JSONRPC
 from txjsonrpc import jsonrpclib
@@ -36,12 +37,32 @@ class Main(JSONRPC):
 
     def jsonrpc_help(self, method):
         method = self._getFunction(method)
-        return getattr(method.im_class, 'documentation', '')
+
+        method_class = method.im_self
+        method_docs = method_class.documentation
+
+        method_name = method_class.name
+        if method_class.schema:
+            method_args = str(method_class.schema)
+        else:
+            method_args = inspect.getargs(method_class.run.im_func.func_code).args
+            method_args.remove('self')
+            method_args = ', '.join(method_args)
+
+        docs = 'Name: {}\nArgs: {}\nDocs: {}\nReturn: {}'.format(
+            method_name, method_args, method_docs,
+            str(method_class.return_schema)
+        )
+
+        return docs
 
     def jsonrpc_list_methods(self):
         methods = []
         methods.extend(self.heisen_project.methods)
-        methods.extend(self.main_project.methods)
+
+        if self.main_project:
+            methods.extend(self.main_project.methods)
+
         methods = sorted(methods)
 
         return methods

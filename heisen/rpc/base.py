@@ -18,8 +18,10 @@ from heisen.core.threading_pool.core_thread import get_twisted_pool as pool
 class RPCBase(object):
     __metaclass__ = abc.ABCMeta
     write_activity = True
+    documentation = ''
     async = True
     schema = {}
+    return_schema = {}
 
     @abc.abstractmethod
     def run(self):
@@ -73,7 +75,6 @@ class RPCBase(object):
                 self.name, validator.errors
             ))
 
-
     def _timeit(self, result, ts, args, kwargs):
         if not settings.LOG_REQUEST:
             return result
@@ -87,7 +88,7 @@ class RPCBase(object):
             self.src,
             self.username,
             start_time,
-            te-ts,
+            te - ts,
             self.name,
             args,
             kwargs,
@@ -111,6 +112,7 @@ class RPCBase(object):
         }
 
         if hasattr(self, 'refine_activity_log'):
-            doc = self.refine_activity_log(doc)
+            doc = self.refine_activity_log(result, doc)
 
+        # insert log to db
         return result

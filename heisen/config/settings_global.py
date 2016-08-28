@@ -85,6 +85,7 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = 'debug'
+EMAIL_TEMPLATE_DIR = os.path.join(HEISEN_BASE_DIR, '/templates')
 
 ZMQ = {
     'HOST': '127.0.0.1',

@@ -66,7 +66,9 @@ class RPCBase(object):
         valid = validator.validate(args_dict, self.schema)
 
         if not valid:
-            raise ValidationError(validator.errors)
+            raise ValidationError('Validation error in {}, Errors: {}'.format(
+                self.name, validator.errors
+            ))
 
 
     def _timeit(self, result, ts, args, kwargs):

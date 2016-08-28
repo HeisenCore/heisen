@@ -81,7 +81,7 @@ class Main(JSONRPC):
 
         message = failure.value.message
         code = self._map_exception(type(failure.value))
-        logger.error(failure.getTraceback())
+        logger.exception(failure.getTraceback())
 
         message = '{}|{}'.format(
             failure.type.__name__,

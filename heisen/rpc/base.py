@@ -5,7 +5,7 @@ import time
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
-from cerberus import ValidationError
+from cerberus import ValidationError, SchemaError
 import import_string
 
 from heisen.config import settings
@@ -63,7 +63,10 @@ class RPCBase(object):
 
         validator_class = import_string(settings.VALIDATOR_CLASS)
         validator = validator_class(allow_unknown=True)
-        valid = validator.validate(args_dict, self.schema)
+        try:
+            valid = validator.validate(args_dict, self.schema)
+        except SchemaError as e:
+            raise SchemaError('Schema error in {}, Errors: {}'.format(self.name, str(e)))
 
         if not valid:
             raise ValidationError('Validation error in {}, Errors: {}'.format(

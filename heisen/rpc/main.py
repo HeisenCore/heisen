@@ -1,4 +1,5 @@
 import inspect
+from pprint import pformat
 import os
 from txjsonrpc.web.jsonrpc import JSONRPC
 from txjsonrpc import jsonrpclib
@@ -43,7 +44,7 @@ class Main(JSONRPC):
 
         method_name = method_class.name
         if method_class.schema:
-            method_args = str(method_class.schema)
+            method_args = pformat(method_class.schema)
         else:
             method_args = inspect.getargs(method_class.run.im_func.func_code).args
             method_args.remove('self')
@@ -51,7 +52,7 @@ class Main(JSONRPC):
 
         docs = 'Name: {}\nArgs: {}\nDocs: {}\nReturn: {}'.format(
             method_name, method_args, method_docs,
-            str(method_class.return_schema)
+            pformat(method_class.return_schema)
         )
 
         return docs

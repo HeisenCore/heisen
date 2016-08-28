@@ -6,6 +6,9 @@ from cerberus import errors
 
 
 class Validator(DefaultValidator):
+    def _validate_isodd(self, isodd, field, value):
+        pass
+
     def _validate_type_objectid(self, field, value):
         if not re.match('[a-f0-9]{24}', str(value)):
             self._error(field, errors.ERROR_BAD_TYPE.format('ObjectId'))

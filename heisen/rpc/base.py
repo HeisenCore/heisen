@@ -94,6 +94,10 @@ class RPCBase(object):
             kwargs,
             result
         )
+
+        if len(msg) > 500:
+            msg = msg[:500] + '...'
+
         logger.request(msg)
 
         return result

@@ -17,10 +17,10 @@ class Email(object):
         self.content = content
 
         if settings.EMAIL_BACKEND == 'debug':
-            self.host = settings.email_host
-            self.port = settings.email_port
-            self.user = settings.email_host_user
-            self.password = settings.email_host_password
+            self.host = settings.EMAIL_HOST
+            self.port = settings.EMAIL_PORT
+            self.user = settings.EMAIL_HOST_USER
+            self.password = settings.EMAIL_HOST_PASSWORD
 
         self.jinja_env = Environment(
             loader=FileSystemLoader(settings.EMAIL_TEMPLATE_DIR),

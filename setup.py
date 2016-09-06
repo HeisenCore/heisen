@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
-
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -26,8 +24,8 @@ requirements = [
     'pjson==1.0',
     'pytz==2016.6.1',
     'Twisted==16.3.0',
-    'txJSON_RPC_heisen==0.4.4',
-    'jsonrpclib_heisen==0.1.11',
+    'txJSON_RPC_heisen==0.4.5',
+    'jsonrpclib_heisen==0.1.13',
     'cython==0.24.1',
     'watchdog==0.8.3',
 ]
@@ -54,8 +52,8 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     dependency_links=[
-        'https://github.com/HeisenCore/txjsonrpc/tarball/master#egg=txJSON_RPC_heisen-0.4.4',
-        'https://github.com/HeisenCore/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.11',
+        'https://github.com/HeisenCore/txjsonrpc/tarball/master#egg=txJSON_RPC_heisen-0.4.5',
+        'https://github.com/HeisenCore/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.13',
     ],
     license="MIT license",
     zip_safe=False,

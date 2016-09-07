@@ -6,6 +6,7 @@ import time
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
 from cerberus import ValidationError, SchemaError
+from bson.json_util import dumps
 import import_string
 
 from heisen.config import settings
@@ -71,9 +72,7 @@ class RPCBase(object):
             raise SchemaError('Schema error in {}, Errors: {}'.format(self.name, str(e)))
 
         if not valid:
-            raise ValidationError('Validation error in {}, Errors: {}'.format(
-                self.name, validator.errors
-            ))
+            raise ValidationError('Validation error in {}'.format(self.name), dumps(validator.errors))
 
     def _timeit(self, result, ts, args, kwargs):
         if not settings.LOG_REQUEST:
@@ -82,17 +81,11 @@ class RPCBase(object):
         te = time.time()
         start_time = datetime.datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
 
-        msg = " start: {2} - [{0}] - [{1}] - time: {3:2.1f}s"
-        msg += " - func: {4} - args: {5} - kwargs: {6} - result: {7}"
+        msg = "start: {2} - [{0}] - [{1}] - time: {3:2.1f}s - "
+        msg += "func: {4} - args: {5} - kwargs: {6} - result: {7}"
         msg = msg.format(
-            self.src,
-            self.username,
-            start_time,
-            te - ts,
-            self.name,
-            args,
-            kwargs,
-            result
+            self.src, self.username, start_time, te - ts,
+            self.name, args, kwargs, result
         )
 
         if len(msg) > 500:

@@ -25,7 +25,7 @@ requirements = [
     'pytz==2016.6.1',
     'Twisted==16.3.0',
     'txJSON_RPC_heisen==0.4.5',
-    'jsonrpclib_heisen==0.1.13',
+    'jsonrpclib_heisen<=0.1.14',
     'cython==0.24.1',
     'watchdog==0.8.3',
 ]
@@ -53,7 +53,7 @@ setup(
     install_requires=requirements,
     dependency_links=[
         'https://github.com/HeisenCore/txjsonrpc/tarball/master#egg=txJSON_RPC_heisen-0.4.5',
-        'https://github.com/HeisenCore/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.13',
+        'https://github.com/HeisenCore/jsonrpclib/tarball/master#egg=jsonrpclib_heisen-0.1.14',
     ],
     license="MIT license",
     zip_safe=False,

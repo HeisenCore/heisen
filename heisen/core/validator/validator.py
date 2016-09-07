@@ -6,7 +6,10 @@ from cerberus import errors
 
 
 class Validator(DefaultValidator):
-    def _validate_isodd(self, isodd, field, value):
+    def _validate_info(self, isodd, field, value):
+        pass
+
+    def _validate_example(self, isodd, field, value):
         pass
 
     def _validate_type_objectid(self, field, value):

@@ -105,9 +105,10 @@ class Main(JSONRPC):
         code = self._map_exception(type(failure.value))
         logger.exception(failure.getTraceback())
 
-        message = '{}|{}'.format(
-            failure.type.__name__,
-            failure.getErrorMessage()
-        )
+        args = ''
+        for arg in failure.value.args:
+            args += '|' + str(arg)
+
+        message = '{}{}'.format(failure.type.__name__, args)
 
         return jsonrpclib.Fault(code, message)

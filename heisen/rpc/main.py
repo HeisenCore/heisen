@@ -9,6 +9,7 @@ from heisen.config import settings
 from heisen.core.log import logger
 from heisen.utils.module import load_module
 
+
 class Main(JSONRPC):
 
     def __init__(self):
@@ -98,17 +99,22 @@ class Main(JSONRPC):
         print message
 
     def _ebRender(self, failure, id):
-        if isinstance(failure.value, jsonrpclib.Fault):
-            return failure.value
+        # FIXME: Errors in this method won't be logged, and will BLOCK request
+        # Make sure this method is error free
+        try:
+            if isinstance(failure.value, jsonrpclib.Fault):
+                return failure.value
 
-        message = failure.value.message
-        code = self._map_exception(type(failure.value))
-        logger.exception(failure.getTraceback())
+            message = failure.value.message
+            code = self._map_exception(type(failure.value))
+            logger._rpc_exception((failure.type, failure.value, failure.tb))
 
-        args = ''
-        for arg in failure.value.args:
-            args += '|' + str(arg)
+            args = ''
+            for arg in failure.value.args:
+                args += '|' + str(arg.encode('utf-8'))
 
-        message = '{}{}'.format(failure.type.__name__, args)
-
-        return jsonrpclib.Fault(code, message)
+            message = '{}{}'.format(failure.type.__name__, args)
+            return jsonrpclib.Fault(code, message)
+        except Exception as e:
+            logger.exception(e)
+            return jsonrpclib.Fault(self.FAILURE, 'Error in logging')

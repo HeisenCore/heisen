@@ -1,8 +1,9 @@
-import os
-from threading import Thread
+import sys
+import io
+
 from twisted.internet import reactor
 from twisted.web import server
-from twisted.python import log
+from twisted.logger import Logger, textFileLogObserver
 from twisted.cred.checkers import FilePasswordDB
 from txjsonrpc.auth import wrapResource
 
@@ -14,6 +15,7 @@ from heisen.core.watchdog import start_watchdog
 
 def start_service():
     print '{} Services Started'.format(settings.APP_NAME.capitalize())
+    sys.excepthook = excepthook
     start_zmq()
     start_watchdog()
     start_reactor()
@@ -22,8 +24,9 @@ def start_service():
 def start_reactor():
     main = Main()
 
-    observer = log.PythonLoggingObserver()
-    observer.start()
+    # Logger(observer=textFileLogObserver(
+    #     io.open("/var/log/heisen/test.log", "a")
+    # ))
 
     path = settings.HEISEN_BASE_DIR + "/config/passwd.db"
     checker = FilePasswordDB(path)
@@ -33,3 +36,8 @@ def start_reactor():
     reactor.suggestThreadPoolSize(settings.BACKGROUND_PROCESS_THREAD_POOL)
 
     reactor.run()
+
+
+def excepthook(_type, value, traceback):
+    import traceback
+    traceback.print_exception(_type, value, traceback)

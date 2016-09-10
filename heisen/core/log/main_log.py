@@ -27,11 +27,16 @@ class FilterWithAbsoluteModuleName(logging.Filter):
         return True
 
 
-def format_exception():
+def format_exception(exc_info=None):
     """
         create and return text of last exception
     """
-    _type, value, tback = sys.exc_info()
+
+    if exc_info is None:
+        _type, value, tback = sys.exc_info()
+    else:
+        _type, value, tback = exc_info
+
     frame_locals = {}
 
     if inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
@@ -42,8 +47,10 @@ def format_exception():
             frame_locals.pop(var)
 
     text = pprint.pformat(frame_locals)
+
     text += '\n'
     text += ''.join(traceback.format_exception(_type, value, tback))
+
     return text
 
 
@@ -80,6 +87,9 @@ class Logger(object):
         getattr(self, logger)(
             '{}\n{}'.format(str(message), format_exception())
         )
+
+    def _rpc_exception(self, exc_info, logger='error'):
+        getattr(self, logger)(format_exception(exc_info))
 
     def setup(self, logger_name, logger_format, logger_level):
         logger = logging.getLogger(logger_name)

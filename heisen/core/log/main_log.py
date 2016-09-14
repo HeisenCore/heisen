@@ -35,21 +35,23 @@ def format_exception(exc_info=None):
     if exc_info is None:
         _type, value, tback = sys.exc_info()
     else:
-        _type, value, tback = exc_info
+        _type, value, tback, traceback_text = exc_info
 
     frame_locals = {}
 
-    if inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
+    if tback and inspect.getinnerframes(tback) and inspect.getinnerframes(tback)[-1]:
         frame_locals = inspect.getinnerframes(tback)[-1][0].f_locals
 
     for var in frame_locals.keys():
         if var.startswith('__'):
             frame_locals.pop(var)
 
-    text = pprint.pformat(frame_locals)
+    text = '{}\n'.format(pprint.pformat(frame_locals))
 
-    text += '\n'
-    text += ''.join(traceback.format_exception(_type, value, tback))
+    if tback is not None:
+        text += ''.join(traceback.format_exception(_type, value, tback))
+    else:
+        text += traceback_text
 
     return text
 

@@ -107,7 +107,11 @@ class Main(JSONRPC):
 
             message = failure.value.message
             code = self._map_exception(type(failure.value))
-            logger._rpc_exception((failure.type, failure.value, failure.tb))
+
+            logger._rpc_exception((
+                failure.type, failure.value, failure.tb,
+                failure.getTraceback()
+            ))
 
             args = ''
             for arg in failure.value.args:
@@ -116,5 +120,10 @@ class Main(JSONRPC):
             message = '{}{}'.format(failure.type.__name__, args)
             return jsonrpclib.Fault(code, message)
         except Exception as e:
-            logger.exception(e)
+            try:
+                logger.exception(e)
+            except Exception as e:
+                print e
+
+            # make sure we return something at any case
             return jsonrpclib.Fault(self.FAILURE, 'Error in logging')

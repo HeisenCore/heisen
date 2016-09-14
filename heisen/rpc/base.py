@@ -5,7 +5,8 @@ import time
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
-from cerberus import ValidationError, SchemaError
+from cerberus import SchemaError
+from cerberus.errors import ValidationError
 from bson.json_util import dumps
 import import_string
 

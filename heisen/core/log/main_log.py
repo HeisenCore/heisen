@@ -127,4 +127,7 @@ class Logger(object):
         filter = FilterWithAbsoluteModuleName()
         logger.addFilter(filter)
 
+        if logger_name == 'py.warnings':
+            logging.captureWarnings(True)
+
         return logger

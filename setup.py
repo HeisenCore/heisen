@@ -16,7 +16,7 @@ requirements = [
     'simplejson==3.8.2',
     'zope.interface==4.0.5',
     'apscheduler==3.2.0',
-    'Cerberus==0.9.2',
+    'Cerberus==1.0.1',
     'cliff==2.1.0',
     'component==0.0.1',
     'docutils==0.12',

@@ -5,8 +5,8 @@ import time
 
 from twisted.internet import reactor
 from twisted.internet.threads import deferToThreadPool
-from cerberus import SchemaError
-from cerberus.errors import ValidationError
+from cerberus import SchemaError, DocumentError
+# from cerberus.errors import ValidationError
 from bson.json_util import dumps
 import import_string
 
@@ -73,7 +73,7 @@ class RPCBase(object):
             raise SchemaError('Schema error in {}, Errors: {}'.format(self.name, str(e)))
 
         if not valid:
-            raise ValidationError('Validation error in {}'.format(self.name), dumps(validator.errors))
+            raise DocumentError('Validation error in {}'.format(self.name), dumps(validator.errors))
 
     def _timeit(self, result, ts, args, kwargs):
         if not settings.LOG_REQUEST:

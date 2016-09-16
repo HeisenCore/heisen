@@ -4,22 +4,58 @@ import time
 import socket
 import random
 
+import zmq
+from jsonrpclib.request import Connection
 from bson.json_util import dumps as bson_dumps
 from bson.json_util import loads as bson_loads
-import zmq
-
-from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 from twisted.internet.threads import deferToThread
-from zmq.utils.jsonapi import dumps
-from zmq.utils.jsonapi import loads
 
 from heisen.core.log import logger
 from heisen.config import settings
 from heisen.core import rpc_call
 
 
+def process(func):
+    def execute(*args, **kwargs):
+        if args[0].lock_time:
+            now = datetime.datetime.now()
+            lock = args[0].lock_time + datetime.timedelta(seconds=settings.WAIT_MEMBER)
+            if now < lock:
+                time.sleep(settings.WAIT_MEMBER)
+                logger.zmq(
+                    'Lock time: {0} | {1} | {2}'.format(
+                        args[0].member_name,
+                        args[1:],
+                        kwargs
+                    )
+                )
+        return func(*args, **kwargs)
+
+    return execute
+
+
 class Base(object):
-    name = 'base'
+    base_topic = 'base'
+
+    @property
+    def _first_member(self):
+        sorted(
+            self.members.values(),
+            key=lambda member: member['instantiate_time'],
+            reverse=False
+        )
+        first_member = filter(lambda member: member['alive'], self.members)[0]
+
+        return first_member['member_name'] == self.member_name
+
+    @property
+    def _host_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((self.server_host, self.pub_port))
+        address = s.getsockname()[0]
+
+        return address
 
     def __init__(self):
         self.instantiate_time = datetime.datetime.now()
@@ -30,7 +66,7 @@ class Base(object):
         self.pub_port = settings.ZMQ['PUB']
         self.rep_port = settings.ZMQ['REP']
 
-        self.peers = []
+        self.members = {}
 
         # Connection for REP/REQ pattern
         context = zmq.Context()
@@ -41,11 +77,10 @@ class Base(object):
 
         self.sign = ' |/\| '
         self._start_subscriber()
-        self.send_info()
-        reactor.callInThread(self.heartbeating)
+        self.send_app_info()
+        LoopingCall(self.heartbeating).start(settings.HEARTBEAT_TIME)
 
     def _start_subscriber(self):
-        logger.zmq('Start subscriber')
         context = zmq.Context()
 
         self.subscriber = context.socket(zmq.SUB)
@@ -53,7 +88,10 @@ class Base(object):
             "tcp://{0}:{1}".format(self.server_host, self.pub_port)
         )
 
-        self.subscriber.setsockopt(zmq.SUBSCRIBE, self.name)
+        self.subscriber.setsockopt(zmq.SUBSCRIBE, self.base_topic)
+        if hasattr(self, 'topic'):
+            self.subscriber.setsockopt(zmq.SUBSCRIBE, self.topic)
+
         worker_sub = deferToThread(self._listener)
         worker_sub.addErrback(log_error)
 
@@ -61,108 +99,130 @@ class Base(object):
 
     def _listener(self):
         while True:
-            string = self.subscriber.recv()
+            try:
+                string = self.subscriber.recv()
+                topic, _, message = string.split(self.sign)
+                message = bson_loads(message)
 
-            if not string:
-                continue
+                handler_name = '_process_message_{}'.format(topic)
+                if hasattr(self, handler_name):
+                    getattr(self, handler_name)(message)
+                else:
+                    logger.zmq('Ignoring message with unknown topic, {}'.format(string))
 
-            message = string.split(self.sign)
-            if len(message) != 2:
-                continue
+                self._process_message(string)
+            except Exception as e:
+                logger.exception(e)
 
-            data = loads(message[1])
+    def _process_message_base(self, message):
+        if message['command'] == 'register':
+            self.add_member(message['key'])
 
-            if data[0] == 'set_value':
-                self.set_value(
-                    messagedata[0],
-                    data[1],
-                    bson_loads(data[2])
-                )
+        elif message['command'] == 'alter_member':
+            if message['key'] in self.members.values():
+                self.members[message['key']]['new_member'] = False
 
-            elif data[0] == 'del_value':
-                self.del_value(messagedata[0], data[1])
-
-            elif data[0] == 'register':
-                self.add_peer(bson_loads(data[1]))
-
-            elif data[0] == 'alter_member':
-                for member in self.registry:
-                    if member['member_name'] == data[1]:
-                        member['new_member'] = False
-
-            if messagedata[0] == 'signaling':
-                data = bson_loads(data)
-
-                for func in self.signaling_funcs:
-                    defer = deferToThread(func, *data)
-                    defer.addErrback(to_log_error)
-
-    def send_info(self, new_member=True):
+    def send_app_info(self, new_member=True):
         info = {
             'instantiate_time': self.instantiate_time,
             'member_name': self.member_name,
+            'app_name': settings.APP_NAME,
             'alive': True,
             'new_member': new_member,
-            'host': self._get_host_ip(),
-            'port': settings.RPC_PORT
+
+            'host': self._host_ip,
+            'port': settings.RPC_PORT,
+            'auth_username': None,
+            'auth_password': None,
             # 'sync': True,  # evaluate after instantiate
         }
 
-        self.send_msg('register', 'controler', info)
-        logger.zmq('Sending info: {0}'.format(info))
+        if settings.CREDENTIALS:
+            username, passowrd = settings.CREDENTIALS[0]
+            info['auth_username'] = username
+            info['auth_password'] = passowrd
 
-    def _get_host_ip(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect((self.server_host, self.pub_port))
-        address = s.getsockname()[0]
+        self.send_msg('controler', 'register', info)
 
-        return address
+    def add_member(self, new_member):
+        if new_member['member_name'] in self.members:
+            return
 
-    def add_peer(self, peer_info):
-        peers = [peer['member_name'] for peer in self.peers]
-
-        if peer_info['member_name'] not in peers:
-            self.peers.append(peer_info)
-            self.lock_time = datetime.datetime.now()
-            self.send_info(new_member=False)
-            logger.zmq('Receive & Rgister: {0}'.format(info))
-
-        self.send_synchronizer()
-
-    def send_synchronizer(self):
-        self.peers.sort(
-            key=lambda peer: peer['instantiate_time'],
-            reverse=False
+        connection_info = (
+            new_member['host'], new_member['port'],
+            new_member['auth_username'], new_member['auth_password']
         )
-        first_member = filter(lambda peer: peer['alive'], self.peers)[0]
+        rpc_call.add_server(new_member['app_name'], connection_info)
 
-        if first_member['member_name'] != self.member_name:
-            return
+        self.members[new_member['member_name']] = new_member
+        self.lock_time = datetime.datetime.now()
 
-        members = []
-        for member in self.registry:
-            if member['new_member'] and member['alive']:
-                host = member['host']
-                port = member['port']
-                name = member['member_name']
-                members.append((host, port, name))
+        if self._first_member:
+            self.send_synchronizer(new_member, connection_info)
 
-        if not members:
-            return
+        logger.zmq('Added new member: {0}'.format(new_member))
 
-        data = []
-        for attr in settings.TOPICS:
-            data.append({attr: getattr(self, attr)})
+    def send_synchronizer(self, new_member, connection_info):
+        data = {}
+        for attr in ['members']:
+            data[attr] = getattr(self, attr)
 
-        for member in members:
-            result = rpc_call.self.main.load_attrs(data)
+        rpc = Connection('heisen', 'zmq', *connection_info)
+        result = rpc.connection.main.load_attrs(data)
 
-            self.alter_member(member[2])
+        self.alter_member(new_member[2])
 
         logger.zmq("Synchronizer result: {0}".format(result))
 
     def alter_member(self, member_name):
-        self.send_msg('alter_member', 'controler', member_name)
+        self.send_msg('controler', 'alter_member', member_name)
+
+    def generate_unique_id(self):
+        chars = string.ascii_lowercase + string.digits
+        return ''.join(random.choice(chars) for i in range(6))
+
+    def send_msg(self, topic, command, key=None, value=None):
+        """
+            args[0] = function name
+            args[1] = attribute name or topic name
+            args[2] = key of dictionary | value of function
+            args[3] = value of dictionary
+        """
+        message = {'command': command, 'key': key, 'value': value}
+        msg = "{0}{1}{2}".format(topic, self.sign, bson_dumps(message))
+        logger.zmq('Sending message {}'.format(msg))
+        self.rep_server.send(msg)
+        self.rep_server.recv()
+
+    def heartbeating(self):
+        for member in self.members:
+            try:
+                connection_info = (
+                    member['host'], member['port'],
+                    member['auth_username'], member['auth_password']
+                )
+                rpc = Connection('heisen', 'zmq', *connection_info)
+                rpc.connection.main.heartbeat()
+            except Exception as e:
+                member['alive'] = False
+                logger.exception(e)
+
+
+def log_error(failure):
+    logger.error(failure.getTraceback())
+
+
+class SharedMemory(Base):
+    topic = 'shared_memory'
+
+    def _process_message_shared_memory(self, message):
+        if message['command'] == 'set_value':
+            self.set_value(
+                message['command'], message['key'], message['value'],
+            )
+
+        elif message['command'] == 'del_value':
+            self.del_value(message['key'])
 
     def del_value(self, attr, key):
         var = getattr(self, attr)
@@ -176,10 +236,6 @@ class Base(object):
     def get_value(self, attr, key):
         return getattr(self, attr)[key]
 
-    def generate_unique_id(self):
-        chars = string.ascii_lowercase + string.digits
-        return ''.join(random.choice(chars) for i in range(6))
-
     def load_attrs(self, data):
         for doc in data:
             for k, v in doc.items():
@@ -190,42 +246,3 @@ class Base(object):
 
     def retrive_attr_without_copy(self, attr):
         return getattr(self, attr)
-
-    def send_msg(self, *args):
-        """
-            args[0] = function name
-            args[1] = attribute name or topic name
-            args[2] = key of dictionary | value of function
-            args[3] = value of dictionary
-        """
-        if args[0] == 'set_value':
-            arg = (args[0], args[2], bson_dumps(args[3]))
-
-        elif args[0] == 'del_value':
-            arg = (args[0], args[2])
-
-        elif args[0] == 'register':
-            arg = (args[0], bson_dumps(args[2]))
-
-        elif args[0] == 'alter_member':
-            arg = (args[0], args[2])
-
-        msg = "{0}{1}{2}".format(args[1], self.sign, dumps(arg))
-        self.rep_server.send(msg)
-        self.rep_server.recv()
-
-    def heartbeating(self):
-        while True:
-            time.sleep(settings.HEARTBEAT_TIME)
-
-            for member in self.registry:
-                try:
-                    result = rpc_call.self.main.heartbeat()
-                except:
-                    member['alive'] = False
-
-            logger.zmq('Heartbeat checking Done... .')
-
-
-def log_error(failure):
-    logger.error(str(failure))

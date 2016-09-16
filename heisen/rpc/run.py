@@ -9,6 +9,7 @@ from txjsonrpc.auth import wrapResource
 
 from heisen.config import settings
 from heisen.rpc.main import Main
+from heisen.rpc.auth import BasicCredChecker
 from heisen.core.zmq_server import start_zmq
 from heisen.core.watchdog import start_watchdog
 
@@ -28,11 +29,11 @@ def start_reactor():
     #     io.open("/var/log/heisen/test.log", "a")
     # ))
 
-    path = settings.HEISEN_BASE_DIR + "/config/passwd.db"
-    checker = FilePasswordDB(path)
-    realm_name = "Server Name: {}".format(settings.APP_NAME)
-    wrappedRoot = wrapResource(main, [checker], realmName=realm_name)
-    reactor.listenTCP(settings.RPC_PORT, server.Site(resource=wrappedRoot))
+    if settings.CREDENTIALS:
+        checker = BasicCredChecker(settings.CREDENTIALS)
+        main = wrapResource(main, [checker], realmName=settings.APP_NAME)
+
+    reactor.listenTCP(settings.RPC_PORT, server.Site(resource=main))
     reactor.suggestThreadPoolSize(settings.BACKGROUND_PROCESS_THREAD_POOL)
 
     reactor.run()
@@ -40,4 +41,5 @@ def start_reactor():
 
 def excepthook(_type, value, traceback):
     import traceback
+    print 'Printing exception via excepthook'
     traceback.print_exception(_type, value, traceback)

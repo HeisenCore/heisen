@@ -9,6 +9,10 @@ HEISEN_BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 LOCAL_TZ = pytz.timezone('Asia/Tehran')
 RPC_PORT = 7089
 APP_NAME = 'heisen'
+CREDENTIALS = [
+    ['aliehsanmilad', 'Key1_s!3cr3t'],
+    ['rostamkhAn!shoja', 'p4ssw0rdVahdaTi'],
+]
 
 DEBUG = True
 

@@ -89,8 +89,8 @@ class RPCBase(object):
             self.name, args, kwargs, result
         )
 
-        if len(msg) > 500:
-            msg = msg[:500] + '...'
+        if len(msg) > 1000:
+            msg = msg[:1000] + '...'
 
         logger.request(msg)
 

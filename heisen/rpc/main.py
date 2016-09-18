@@ -113,9 +113,18 @@ class Main(JSONRPC):
                 failure.getTraceback()
             ))
 
+            if not message:
+                message = str(failure.value)
+
             args = ''
             for arg in failure.value.args:
-                args += '|' + str(arg.encode('utf-8'))
+                if isinstance(arg, unicode):
+                    arg = arg.encode('utf-8')
+
+                if not isinstance(arg, str):
+                    arg = str(arg)
+
+                args += '|' + arg
 
             message = '{}{}'.format(failure.type.__name__, args)
             return jsonrpclib.Fault(code, message)

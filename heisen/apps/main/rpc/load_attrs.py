@@ -18,6 +18,6 @@ class RPC(RPCBase):
     }
 
     def run(self, data):
-        memory.load_attrs(data)
+        memory.members = data
 
         return True

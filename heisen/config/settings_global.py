@@ -96,15 +96,5 @@ ZMQ = {
     'PUB': 5556,
     'REP': 5575
 }
-
-TOPICS = [
-    'shared_memory',
-    'controler',
-    'signaling'
-]
 WAIT_MEMBER = 3
-HEARTBEAT_TIME = 300
-
-START_ZMQ = 1
-PUB_SERVER_PORT = 5556
-REP_SERVER_PORT = 5575
+HEARTBEAT_TIME = 5 * 60

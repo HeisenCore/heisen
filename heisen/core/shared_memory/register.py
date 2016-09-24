@@ -16,7 +16,7 @@ class Register(Base):
     @property
     def _first_member(self):
         alive_members = filter(
-            lambda member: member['alive'], self.members.values()
+            lambda member: member['alive'], self._members.values()
         )
         sorted_alive_members = sorted(
             alive_members,
@@ -35,9 +35,13 @@ class Register(Base):
 
         return address
 
+    @property
+    def members(self):
+        return self._members
+
     def __init__(self):
         super(Register, self).__init__()
-        self.members = {}
+        self._members = {}
 
         self._tell_others()
         LoopingCall(self._heartbeat).start(settings.HEARTBEAT_TIME)
@@ -64,7 +68,7 @@ class Register(Base):
         self._send_message('add_member', member)
 
     def _heartbeat(self):
-        for name, member in self.members.items():
+        for name, member in self._members.items():
             try:
                 connection_info = (
                     member['host'], member['port'],
@@ -78,12 +82,12 @@ class Register(Base):
 
     def add_member(self, new_member):
         if new_member['member_name'] == self.member_name:
-            self.members[new_member['member_name']] = new_member
+            self._members[new_member['member_name']] = new_member
 
-        if new_member['member_name'] in self.members:
+        if new_member['member_name'] in self._members:
             return
 
-        self.members[new_member['member_name']] = new_member
+        self._members[new_member['member_name']] = new_member
 
         connection_info = (
             new_member['host'], new_member['port'],
@@ -94,9 +98,9 @@ class Register(Base):
         self.lock_time = datetime.datetime.now()
 
         if self._first_member:
-            self._send_message('renew_members', self.members)
+            self._send_message('renew_members', self._members)
 
         logger.zmq('Added new member: {0}'.format(new_member))
 
     def renew_members(self, members):
-        self.members = members
+        self._members = members

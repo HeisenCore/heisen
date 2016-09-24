@@ -98,3 +98,7 @@ ZMQ = {
 }
 WAIT_MEMBER = 3
 HEARTBEAT_TIME = 5 * 60
+MEMORY_KEYS = (
+    'requet',
+    'mongo',
+)

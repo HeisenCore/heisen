@@ -4,6 +4,7 @@ import time
 from heisen.core.log import logger
 from heisen.config import settings
 from heisen.core.shared_memory.base import Base
+from heisen.core.shared_memory.memory import Memory
 
 
 def process(func):
@@ -28,14 +29,25 @@ def process(func):
 class SharedMemory(Base):
     topic = 'memory'
 
-    def _process_message_shared_memory(self, message):
-        if message['command'] == 'set_value':
-            self.set_value(
-                message['command'], message['key'], message['value'],
-            )
+    def __init__(self):
+        super(SharedMemory, self).__init__()
 
-        elif message['command'] == 'del_value':
-            self.del_value(message['key'])
+        for key in settings.MEMORY_KEYS:
+            setattr(self, key, Memory(_name=key, _callback=self._memory_updated))
+
+    def _memory_updated(self, key):
+        self._send_message(
+            'update',
+            self.member_name,
+            key,
+            getattr(self, key).to_dic()
+        )
+
+    def update(self, member_name, key, value):
+        if member_name == self.member_name:
+            return
+
+        getattr(self, key).update(_notify=False, **value)
 
     def del_value(self, attr, key):
         var = getattr(self, attr)

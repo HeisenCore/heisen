@@ -16,7 +16,7 @@ class Email(object):
         self.subject = subject
         self.content = content
 
-        if settings.EMAIL_BACKEND == 'debug':
+        if settings.EMAIL_BACKEND != 'debug':
             self.host = settings.EMAIL_HOST
             self.port = settings.EMAIL_PORT
             self.user = settings.EMAIL_HOST_USER
@@ -61,6 +61,9 @@ class Email(object):
         if settings.EMAIL_BACKEND == 'smtp':
             self._smtp(receiver)
         elif settings.EMAIL_BACKEND == 'debug':
-            logger.debug(self.msg.as_string())
+            logger.debug(self.subject)
+            logger.debug(self.content)
+
+            #logger.debug(self.msg.as_string())
 
         return True

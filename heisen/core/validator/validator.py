@@ -1,6 +1,7 @@
 import re
 
 from bson.regex import Regex
+from bson import ObjectId
 from cerberus import Validator as DefaultValidator
 from cerberus import errors
 
@@ -14,12 +15,15 @@ class Validator(DefaultValidator):
         """ {'type': 'string'} """
         pass
 
-    def _validate_type_objectid(self, field, value):
-        if re.match('[a-f0-9]{24}', str(value)):
+    def _validate_type_bsonregex(self, value):
+        if isinstance(value, Regex):
             return True
 
-    def _validate_type_bsonregex(self, field, value):
-        if isinstance(value, Regex):
+    def _validate_type_objectid(self, value):
+        if isinstance(value, ObjectId):
+            return True
+
+        if ObjectId.is_valid(value):
             return True
 
     def _validator_email(self, field, value):

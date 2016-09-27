@@ -1,7 +1,7 @@
 from twisted.internet import reactor
 
 from heisen.rpc.base import RPCBase
-from heisen.core.shared_memory import memory
+# from heisen.core.shared_memory import memory
 from heisen.core import rpc_call
 
 

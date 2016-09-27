@@ -1,4 +1,4 @@
-from heisen.core.shared_memory import memory
+# from heisen.core.shared_memory import memory
 from heisen.rpc.base import RPCBase
 
 

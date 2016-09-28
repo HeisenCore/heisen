@@ -36,44 +36,52 @@ LOG_BACKUP_COUNT = 10
 LOG_REQUEST = True
 LOGGERS = {
     'error': {
-        'format':'complete',
+        'format': 'complete',
         'level': logging.INFO
     },
     'service': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.INFO
     },
     'db': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.INFO
     },
     'jobs': {
-        'format':'complete',
+        'format': 'complete',
         'level': logging.INFO
     },
     'request': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.INFO
     },
     'debug': {
-        'format':'complete',
+        'format': 'complete',
         'level': logging.INFO
     },
     'zmq': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.INFO
     },
     'apscheduler': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.DEBUG
     },
     'twisted': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.ERROR
     },
     'py.warnings': {
-        'format':'basic',
+        'format': 'basic',
         'level': logging.WARN
+    },
+    'txjsonrpc': {
+        'format': 'basic',
+        'level': logging.INFO
+    },
+    'jsonrpclib': {
+        'format': 'basic',
+        'level': logging.DEBUG
     },
 }
 

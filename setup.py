@@ -23,7 +23,7 @@ requirements = [
     'import_string==0.1.0',
     'pjson==1.0',
     'pytz==2016.6.1',
-    'Twisted==16.3.0',
+    'Twisted',
     'txJSON_RPC_heisen==0.4.5',
     'jsonrpclib_heisen<=0.1.14',
     'cython==0.24.1',

@@ -1,13 +1,7 @@
 import os
-import signal
-import sys
-import time
-import logging
-import subprocess
 from watchdog.observers import Observer
 from watchdog import events
 
-import os
 from heisen.core import rpc_call
 from heisen.core.log import logger
 from heisen.config import settings
@@ -29,6 +23,9 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
             return
 
         if 'rpc' not in path:
+            return
+
+        if '#' in path:
             return
 
         try:

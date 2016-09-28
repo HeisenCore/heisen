@@ -89,8 +89,9 @@ class Main(JSONRPC):
                         .replace('.py', '')\
                         .replace('.rpc', '')
 
+        app = self
         for subhandler in full_name.split('.')[:-1]:
-            app = self.subHandlers[subhandler]
+            app = app.subHandlers[subhandler]
 
         app.set_method(full_name.split('.')[-1], method.RPC(full_name))
 
@@ -99,8 +100,6 @@ class Main(JSONRPC):
         print message
 
     def _ebRender(self, failure, id):
-        # FIXME: Errors in this method won't be logged, and will BLOCK request
-        # Make sure this method is error free
         try:
             if isinstance(failure.value, jsonrpclib.Fault):
                 return failure.value
@@ -128,11 +127,12 @@ class Main(JSONRPC):
 
             message = '{}{}'.format(failure.type.__name__, args)
             return jsonrpclib.Fault(code, message)
-        except Exception as e:
+        except Exception as original_exception:
             try:
-                logger.exception(e)
-            except Exception as e:
-                print e
+                logger.exception(original_exception)
+            except Exception:
+                import traceback
+                traceback.print_exc()
 
             # make sure we return something at any case
-            return jsonrpclib.Fault(self.FAILURE, 'Error in logging')
+            return jsonrpclib.Fault(self.FAILURE, 'Error in logging, check server stdout')

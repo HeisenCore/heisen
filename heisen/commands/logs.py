@@ -8,4 +8,4 @@ from heisen.config import settings
 
 class Command(CliffCommand):
     def take_action(self, parsed_args):
-        os.system('tail -f {}{}/*'.format(settings.LOG_DIR, settings.APP_NAME))
+        os.system('tail -F {}{}/*.log'.format(settings.LOG_DIR, settings.APP_NAME))

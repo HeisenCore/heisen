@@ -1,5 +1,6 @@
 import datetime
 import socket
+from functools import partial
 
 from jsonrpclib.request import Connection
 from twisted.internet.task import LoopingCall
@@ -39,9 +40,15 @@ class Register(Base):
     def members(self):
         return self._members
 
-    def __init__(self):
+    def __init__(self, new_member_callbacks=None):
         super(Register, self).__init__()
         self._members = {}
+        self._new_member_callbacks = new_member_callbacks
+
+        if self._new_member_callbacks is None:
+            self._new_member_callbacks = []
+
+        self._new_member_callbacks.insert(0, self._renew_members)
 
         self._tell_others()
         LoopingCall(self._heartbeat).start(settings.HEARTBEAT_TIME)
@@ -98,9 +105,13 @@ class Register(Base):
         self.lock_time = datetime.datetime.now()
 
         if self._first_member:
-            self._send_message('renew_members', self._members)
+            for callback in self._new_member_callbacks:
+                callback()
 
         logger.zmq('Added new member: {0}'.format(new_member))
+
+    def _renew_members(self):
+        self._send_message('renew_members', self._members)
 
     def renew_members(self, members):
         self._members = members

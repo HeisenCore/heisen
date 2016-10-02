@@ -32,42 +32,45 @@ class SharedMemory(Base):
     def __init__(self):
         super(SharedMemory, self).__init__()
 
-        for key in settings.MEMORY_KEYS:
-            setattr(self, key, Memory(_name=key, _callback=self._memory_updated))
+        for memory_name in settings.MEMORY_KEYS:
+            setattr(self, memory_name, {})
 
-    def _memory_updated(self, key):
-        self._send_message(
-            'update',
-            self.member_name,
-            key,
-            getattr(self, key).to_dic()
-        )
+    def __getitem__(self, key):
+        for memory_name in settings.MEMORY_KEYS:
+            return getattr(self, memory_name)
+        else:
+            raise KeyError()
 
-    def update(self, member_name, key, value):
+    def _new_member(self):
+        for memory_name in settings.MEMORY_KEYS:
+            self._send_message('load_memory', memory_name, getattr(self, memory_name))
+
+    def _memory_updated(self, memory_name):
+        memory = getattr(self, memory_name)
+
+        if not memory:
+            return
+
+        self._send_message('update', self.member_name, memory_name, memory)
+
+    def update(self, member_name, memory_name, value):
         if member_name == self.member_name:
             return
 
-        getattr(self, key).update(_notify=False, **value)
+        getattr(self, memory_name).update(**value)
 
-    def del_value(self, attr, key):
-        var = getattr(self, attr)
-        del var[key]
+    def load_memory(self, key, memory):
+        if not memory:
+            return
 
-    @process
-    def set_value(self, attr, key, value):
-        var = getattr(self, attr)
-        var[key] = value
+        getattr(self, key).update(**memory)
 
-    def get_value(self, attr, key):
-        return getattr(self, attr)[key]
+    # @process
+    def set(self, memory_name, key, value):
+        memory = getattr(self, memory_name)
+        memory[key] = value
 
-    def load_attrs(self, data):
-        for doc in data:
-            for k, v in doc.items():
-                setattr(self, k, v)
+        self._memory_updated(memory_name)
 
-    def retrive_attr(self, attr):
-        return getattr(self, attr).copy()
-
-    def retrive_attr_without_copy(self, attr):
-        return getattr(self, attr)
+    def get(self, memory_name):
+        return getattr(self, memory_name)

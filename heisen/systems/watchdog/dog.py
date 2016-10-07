@@ -1,9 +1,11 @@
 import os
+import traceback
+from multiprocessing import Process
+
 from watchdog.observers import Observer
 from watchdog import events
 
 from heisen.core import rpc_call
-from heisen.core.log import logger
 from heisen.config import settings
 
 
@@ -31,7 +33,7 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         try:
             rpc_call.self.reload(path)
         except Exception as e:
-            logger.exception(e)
+            traceback.print_exception()
 
 
 def monitor(directory):
@@ -56,3 +58,12 @@ def monitor_heisen():
 def monitor_app():
     if hasattr(settings, 'BASE_DIR'):
         monitor(settings.BASE_DIR)
+
+
+if __name__ == '__main__':
+    if settings.DEBUG:
+        p = Process(name='heisen_monitor', target=monitor_heisen)
+        p.start()
+
+        p = Process(name='app_monitor', target=monitor_app)
+        p.start()

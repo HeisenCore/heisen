@@ -6,9 +6,7 @@ import os
 
 from cliff.app import App as CliffApp
 from cliff.commandmanager import CommandManager
-from cliff.command import Command
 
-from heisen.core.log import logger
 from heisen.config import settings
 from heisen.utils.module import load_module
 
@@ -42,8 +40,6 @@ def main(argv=sys.argv[1:], manager=None):
     if getattr(settings, 'BASE_DIR', None):
         get_commands(settings.BASE_DIR, manager)
 
-    # manager.add_command('run', Run)
-    # manager.add_command('stop', Stop)
     myapp = App(manager)
     return myapp.run(argv)
 

@@ -24,7 +24,7 @@ class Settings(object):
                     setattr(self, config, int(os.environ[config]))
                 except Exception as e:
                     setattr(self, config, os.environ[config])
-                    print e
+                    print(e)
             elif config.isupper():
                 setattr(self, config, getattr(module, config))
 

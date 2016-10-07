@@ -1,7 +1,6 @@
 # coding: utf-8
 import os
 import logging
-from json import loads
 
 import pytz
 
@@ -106,7 +105,9 @@ ZMQ = {
 }
 WAIT_MEMBER = 3
 HEARTBEAT_TIME = 5 * 60
+
 MEMORY_KEYS = (
     'requet',
     'mongo',
 )
+INSTANCE_COUNT = 1

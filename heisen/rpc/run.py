@@ -10,13 +10,11 @@ from txjsonrpc.auth import wrapResource
 from heisen.config import settings
 from heisen.rpc.main import Main
 from heisen.rpc.auth import BasicCredChecker
-from heisen.core.watchdog import start_watchdog
 
 
 def start_service():
-    print '{} Services Started'.format(settings.APP_NAME.capitalize())
+    print('{} Services Started'.format(settings.APP_NAME.capitalize()))
     sys.excepthook = excepthook
-    start_watchdog()
     start_reactor()
 
 

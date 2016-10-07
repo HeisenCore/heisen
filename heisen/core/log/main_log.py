@@ -50,7 +50,7 @@ def format_exception(exc_info=None):
 
         text = '{}\n'.format(pprint.pformat(frame_locals))
     except Exception:
-        print 'Error in getting frame variables'
+        print('Error in getting frame variables')
         traceback.print_exc()
         text = ''
 
@@ -70,7 +70,7 @@ class Logger(object):
 
     def __init__(self):
         if not hasattr(settings, 'LOGGERS'):
-            print '*** No loggers found ***'
+            print('*** No loggers found ***')
             return
 
         for logger_name, logger_config in settings.LOGGERS.items():
@@ -104,7 +104,14 @@ class Logger(object):
         logger.disabled = False
         logger.setLevel(logger_level)
 
-        log_dir = join(settings.LOG_DIR, settings.APP_NAME)
+        log_dir = join(
+            settings.LOG_DIR,
+            '{}{:02}'.format(
+                settings.APP_NAME,
+                int(os.environ.get('INSTANCE_NUMBER', 1))
+            )
+        )
+
         try:
             os.makedirs(log_dir, 0755)
         except Exception as e:

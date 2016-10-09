@@ -11,10 +11,10 @@ class BaseConfig(object):
     autorestart = True
     autostart = True
     redirect_stderr = True
+    numprocs = 1
+    numprocs_start = 1
 
-    def __init__(self, instance_number=1):
-        self._instance_number = instance_number
-
+    def __init__(self):
         self.environment = self.get_environment()
         self.stdout_logfile = self.log_path()
 
@@ -36,7 +36,7 @@ class BaseConfig(object):
         )
 
     def get_environment(self):
-        environment = 'INSTANCE_NUMBER={}'.format(self._instance_number)
+        environment = 'INSTANCE_NUMBER="%(process_num)s"'
 
         path = None
         for method in [
@@ -49,7 +49,7 @@ class BaseConfig(object):
                 break
 
         if path:
-            environment += ':PATH={}'.format(path)
+            environment += ',PATH="{}"'.format(path)
 
         return environment
 
@@ -106,26 +106,23 @@ class WatchDog(BaseConfig):
 class Heisen(BaseConfig):
     name = settings.APP_NAME
     directory = getattr(settings, 'BASE_DIR', settings.HEISEN_BASE_DIR)
+    process_name = '%(program_name)s%(process_num)02d'
+    numprocs = settings.INSTANCE_COUNT
     command = 'python {}.py run'.format(
         'manage' if hasattr(settings, 'BASE_DIR') else 'cli'
     )
 
-    def __init__(self, instance_number=1):
-        self.name = '{}{:02}'.format(self.name, instance_number)
-
-        super(Heisen, self).__init__(instance_number)
-
     def log_path(self):
-        log_dir = '{}{}{:02}/'.format(
+        log_dir = '{}{}%(process_num)02d/'.format(
             settings.LOG_DIR,
-            settings.APP_NAME,
-            self._instance_number
+            settings.APP_NAME
         )
 
         # TODO: move this to better place
-        try:
-            os.makedirs(log_dir, 0755)
-        except Exception as e:
-            pass
+        for i in range(settings.INSTANCE_COUNT):
+            try:
+                os.makedirs(log_dir % {'process_num': i + 1}, 0755)
+            except Exception as e:
+                pass
 
         return '{}stdout.log'.format(log_dir)

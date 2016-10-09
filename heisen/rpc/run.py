@@ -1,4 +1,5 @@
 import sys
+import os
 import io
 
 from twisted.internet import reactor
@@ -29,7 +30,8 @@ def start_reactor():
         checker = BasicCredChecker(settings.CREDENTIALS)
         main = wrapResource(main, [checker], realmName=settings.APP_NAME)
 
-    reactor.listenTCP(settings.RPC_PORT, server.Site(resource=main))
+    port = settings.RPC_PORT + int(os.environ.get('INSTANCE_NUMBER', 1)) - 1
+    reactor.listenTCP(port, server.Site(resource=main))
     reactor.suggestThreadPoolSize(settings.BACKGROUND_PROCESS_THREAD_POOL)
 
     reactor.run()

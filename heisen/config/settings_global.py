@@ -110,4 +110,4 @@ MEMORY_KEYS = (
     'requet',
     'mongo',
 )
-INSTANCE_COUNT = 1
+INSTANCE_COUNT = 3

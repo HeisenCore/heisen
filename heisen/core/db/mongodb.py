@@ -59,6 +59,7 @@ class CommandLogger(monitoring.CommandListener):
 
 class MongoConnection(object):
     __db = None
+
     def __init__(self, config_name):
         logger.db('Creating cursor instance for {} db'.format(config_name))
         self.db_settings = settings.DATABASES[config_name]

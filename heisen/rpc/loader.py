@@ -57,7 +57,6 @@ class Project(object):
 
         return list(methods)
 
-
     def _load_apps(self):
         for app_dir in self.app_dirs:
             rpc_dir = join(app_dir, 'rpc')
@@ -70,17 +69,17 @@ class Project(object):
             logger.service('----- Adding App {} -----'.format(full_app_name))
 
             for method_name in self._get_method_list(rpc_dir):
-                method_module = load_module(method_name, rpc_dir)
                 method_full_name = '{}.{}'.format(full_app_name, method_name)
+                try:
+                    method_module = load_module(method_name, rpc_dir, False)
+                    method_class = method_module.RPC(method_full_name)
 
-                if method_module is None:
-                    continue
-
-                method_class = method_module.RPC(method_full_name)
-
-                logger.service('Adding method {}'.format(method_full_name))
-                application.set_method(method_name, method_class)
-                self.methods.append(method_full_name)
+                    logger.service('Adding method {}'.format(method_full_name))
+                    application.set_method(method_name, method_class)
+                    self.methods.append(method_full_name)
+                except Exception as e:
+                    logger.error('Failed to load method {}'.format(method_full_name))
+                    logger.exception(e)
 
             logger.service('----- Finished Adding App {} -----'.format(full_app_name))
 

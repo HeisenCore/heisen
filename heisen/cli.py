@@ -56,7 +56,10 @@ def get_commands(path, manager):
         command_name = command_file.replace('.py', '')
         command = load_module(command_name, command_dir)
 
-        manager.add_command(command_name, command.Command)
+        if command:
+            manager.add_command(command_name, command.Command)
+        else:
+            print('Failed to load command {}'.format(command_name))
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

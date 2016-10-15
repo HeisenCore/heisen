@@ -1,3 +1,4 @@
+import abc
 import os
 from os.path import join, exists
 
@@ -5,6 +6,40 @@ from heisen.config import settings
 
 
 class BaseConfig(object):
+    __metaclass__ = abc.ABCMeta
+
+    def configs(self):
+        options = {}
+
+        for option in dir(self):
+            if not (option.startswith('_') or callable(getattr(self, option))):
+                options[option] = getattr(self, option)
+
+        return options
+
+    def write_config(self):
+        supervisor_config = '/etc/supervisor/conf.d/'
+        config_parser = ConfigParser.RawConfigParser()
+
+        config_parser.add_section(self._section_name)
+        for option, value in sorted(self.configs().items()):
+            config_parser.set(self._section_name, option, value)
+
+        config_parser.remove_option(self._section_name, 'name')
+
+        with open('{}{}'.format(supervisor_config, self._filename), 'w') as configfile:
+            supervisor_config,
+            configfile.write('# Auto generated file, Don\'t edit.\n')
+            config_parser.write(configfile)
+
+        print('Created config file for {} in {}{}'.format(
+            self.name, supervisor_config, self._filename
+        ))
+
+
+class Application(BaseConfig):
+    __metaclass__ = abc.ABCMeta
+
     user = os.environ['USER']
     startretries = 100
     stopasgroup = True
@@ -18,21 +53,9 @@ class BaseConfig(object):
         self.environment = self.get_environment()
         self.stdout_logfile = self.log_path()
 
-    def configs(self):
-        options = {}
-
-        for option in dir(self):
-            if not (option.startswith('_') or callable(getattr(self, option))):
-                options[option] = getattr(self, option)
-
-        return options
-
-    def section_name(self):
-        return 'program:{}'.format(self.name)
-
-    def config_filename(self):
-        return '{}.conf'.format(
-            self.section_name().replace('program:', '')
+        self._section_name = 'program:{}'.format(self.name)
+        self._filename = '{}.conf'.format(
+            self._section_name.replace('program:', '')
         )
 
     def get_environment(self):
@@ -85,7 +108,36 @@ class BaseConfig(object):
         return self._is_virtualenv(parent_dir)
 
 
-class ZMQ(BaseConfig):
+class UnixHttp(BaseConfig):
+    name = 'unix_http_server'
+    chmod = 0770
+    chown = '{}:{}'.format(os.environ['USER'], os.environ['USER'])
+
+    def __init__(self):
+        self._section_name = self.name
+        self._filename = self.name
+
+
+class InetHttp(BaseConfig):
+    name = 'inet_http_server'
+    port = '127.0.0.1:9001'
+
+    def __init__(self):
+        self._section_name = self.name
+        self._filename = self.name
+
+
+class Group(BaseConfig):
+    name = self.APP_NAME
+    programs = self.APP_NAME
+    priority = 999
+
+    def __init__(self):
+        self._section_name = 'group:{}'.format(self.name)
+        self._filename = 'group_{}'.format(self.name)
+
+
+class ZMQ(Application):
     name = '{}_zmq'.format(settings.APP_NAME)
     directory = settings.HEISEN_BASE_DIR
     command = 'python systems/zmq/server.py'
@@ -94,7 +146,7 @@ class ZMQ(BaseConfig):
         return '{}{}_stdout.log'.format(settings.LOG_DIR, self.name)
 
 
-class WatchDog(BaseConfig):
+class WatchDog(Application):
     name = '{}_watchdog'.format(settings.APP_NAME)
     directory = settings.HEISEN_BASE_DIR
     command = 'python systems/watchdog/dog.py'
@@ -103,7 +155,7 @@ class WatchDog(BaseConfig):
         return '{}{}_stdout.log'.format(settings.LOG_DIR, self.name)
 
 
-class Heisen(BaseConfig):
+class Heisen(Application):
     name = settings.APP_NAME
     directory = getattr(settings, 'BASE_DIR', settings.HEISEN_BASE_DIR)
     process_name = '%(program_name)s%(process_num)02d'

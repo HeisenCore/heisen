@@ -1,5 +1,6 @@
 import os
 import traceback
+import xmlrpclib
 from multiprocessing import Process
 
 from watchdog.observers import Observer
@@ -8,6 +9,8 @@ from watchdog import events
 from heisen.core import rpc_call
 from heisen.config import settings
 
+from heapq.systems.service.supervisor import supervisor
+
 
 class HeisenEventHandler(events.RegexMatchingEventHandler):
     def __init__(self, *args, **kwargs):
@@ -15,10 +18,13 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         super(HeisenEventHandler, self).__init__(*args, **kwargs)
 
     def on_created(self, event):
-        self.reload(event.src_path)
+        self.restart()
 
     def on_modified(self, event):
-        self.reload(event.src_path)
+        if 'rpc' in event.src_path:
+            self.reload(event.src_path)
+        else:
+            self.restart()
 
     def reload(self, path):
         if os.path.join(self.base_dir, 'apps') not in path:
@@ -34,6 +40,9 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
             rpc_call.self.reload(path)
         except Exception as e:
             traceback.print_exception()
+
+    def restart(self):
+        supervisor.restart_heisen()
 
 
 def monitor(directory):

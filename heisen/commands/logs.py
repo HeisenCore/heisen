@@ -8,4 +8,10 @@ from heisen.config import settings
 
 class Command(CliffCommand):
     def take_action(self, parsed_args):
-        os.system('tail -F {}{}/*.log'.format(settings.LOG_DIR, settings.APP_NAME))
+        app_dirs = []
+        base_dir = os.path.join(settings.LOG_DIR, settings.APP_NAME)
+
+        for i in range(settings.INSTANCE_COUNT):
+            app_dirs.append('{}{:02}/*.log'.format(base_dir, i + 1))
+
+        os.system('tail -F {}'.format(' '.join(app_dirs)))

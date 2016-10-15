@@ -6,6 +6,7 @@ import os
 
 from cliff.app import App as CliffApp
 from cliff.commandmanager import CommandManager
+from cliff import complete
 
 from heisen.config import settings
 from heisen.utils.module import load_module
@@ -40,6 +41,7 @@ def main(argv=sys.argv[1:], manager=None):
     if getattr(settings, 'BASE_DIR', None):
         get_commands(settings.BASE_DIR, manager)
 
+    manager.add_command('complete', complete.CompleteCommand)
     myapp = App(manager)
     return myapp.run(argv)
 

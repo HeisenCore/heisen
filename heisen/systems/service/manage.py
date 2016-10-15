@@ -1,7 +1,6 @@
-from heisen.systems.manager import apps
-from heisen.systems.manager import utils
-
-from heapq.systems.service.supervisor import supervisor
+from heisen.systems.service import apps
+from heisen.systems.service import utils
+from heisen.systems.service.supervisor import supervisor
 
 
 def create_config():

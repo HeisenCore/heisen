@@ -128,8 +128,8 @@ class InetHttp(BaseConfig):
 
 
 class Group(BaseConfig):
-    name = self.APP_NAME
-    programs = self.APP_NAME
+    name = settings.APP_NAME
+    programs = settings.APP_NAME
     priority = 999
 
     def __init__(self):

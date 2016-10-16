@@ -17,14 +17,20 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         self.base_dir = kwargs.pop('base_dir', None)
         super(HeisenEventHandler, self).__init__(*args, **kwargs)
 
+    def on_deleted(self, event):
+        self.restart()
+
     def on_created(self, event):
         self.restart()
 
     def on_modified(self, event):
-        if 'rpc' in event.src_path:
-            self.reload(event.src_path)
-        else:
-            self.restart()
+        self.restart()
+
+        # TODO: reload all instances of app
+        # if 'rpc' in event.src_path:
+        #     self.reload(event.src_path)
+        # else:
+        #     self.restart()
 
     def reload(self, path):
         if os.path.join(self.base_dir, 'apps') not in path:

@@ -16,7 +16,3 @@ def create_config():
         app.write_config()
 
     supervisor.reload_config()
-
-
-if __name__ == '__main__':
-    create_config()

@@ -1,6 +1,7 @@
 import abc
 import os
 from os.path import join, exists
+import ConfigParser
 
 from heisen.config import settings
 
@@ -27,12 +28,12 @@ class BaseConfig(object):
 
         config_parser.remove_option(self._section_name, 'name')
 
-        with open('{}{}'.format(supervisor_config, self._filename), 'w') as configfile:
+        with open('{}{}.conf'.format(supervisor_config, self._filename), 'w') as configfile:
             supervisor_config,
             configfile.write('# Auto generated file, Don\'t edit.\n')
             config_parser.write(configfile)
 
-        print('Created config file for {} in {}{}'.format(
+        print('Created config file for {} in {}{}.conf'.format(
             self.name, supervisor_config, self._filename
         ))
 
@@ -54,7 +55,7 @@ class Application(BaseConfig):
         self.stdout_logfile = self.log_path()
 
         self._section_name = 'program:{}'.format(self.name)
-        self._filename = '{}.conf'.format(
+        self._filename = '{}'.format(
             self._section_name.replace('program:', '')
         )
 
@@ -110,7 +111,7 @@ class Application(BaseConfig):
 
 class UnixHttp(BaseConfig):
     name = 'unix_http_server'
-    chmod = 0770
+    chmod = '0770'
     chown = '{}:{}'.format(os.environ['USER'], os.environ['USER'])
 
     def __init__(self):

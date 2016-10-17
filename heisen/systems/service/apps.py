@@ -80,7 +80,7 @@ class UnixHttp(BaseConfig):
 
 class InetHttp(BaseConfig):
     name = 'inet_http_server'
-    port = '127.0.0.1:9001'
+    port = '127.0.0.1:9900'
 
     def __init__(self):
         self._section_name = self.name

@@ -14,4 +14,7 @@ class Command(CliffCommand):
         for i in range(settings.INSTANCE_COUNT):
             app_dirs.append('{}{:02}/*.log'.format(base_dir, i + 1))
 
+        app_dirs.append('{}/{}_watchdog_stdout.log'.format(settings.LOG_DIR, settings.APP_NAME))
+        app_dirs.append('{}/{}_zmq_stdout.log'.format(settings.LOG_DIR, settings.APP_NAME))
+
         os.system('tail -F {}'.format(' '.join(app_dirs)))

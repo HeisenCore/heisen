@@ -48,24 +48,17 @@ class Application(BaseConfig):
     redirect_stderr = True
     numprocs = 1
     numprocs_start = 1
+    environment = 'INSTANCE_NUMBER="%(process_num)s"'
 
     def __init__(self, virtualenv_dir):
-        self.environment = self.get_environment(virtualenv_dir)
+        if virtualenv_dir:
+            self.environment += ',PATH="{}"'.format(virtualenv_dir)
+            print('Using {} as virtualenv directory'.format(virtualenv_dir))
+
         self.stdout_logfile = self.log_path()
 
         self._section_name = 'program:{}'.format(self.name)
-        self._filename = '{}'.format(
-            self._section_name.replace('program:', '')
-        )
-
-    def get_environment(self, virtualenv_dir=None):
-        environment = 'INSTANCE_NUMBER="%(process_num)s"'
-
-        if virtualenv_dir:
-            environment += ',PATH="{}"'.format(virtualenv_dir)
-            print('Using {} as virtualenv directory'.format(virtualenv_dir))
-
-        return environment
+        self._filename = self._section_name.replace('program:', '')
 
 
 class UnixHttp(BaseConfig):
@@ -101,6 +94,11 @@ class ZMQ(Application):
     name = '{}_zmq'.format(settings.APP_NAME)
     directory = settings.HEISEN_BASE_DIR
     command = 'python systems/zmq/server.py'
+    environment = (
+        'INSTANCE_NUMBER="%(process_num)s",' +
+        'PUB_SERVER_PORT="{}",' +
+        'REP_SERVER_PORT="{}"'
+    ).format(settings.ZMQ['PUB'], settings.ZMQ['REP'])
 
     def log_path(self):
         return '{}{}_stdout.log'.format(settings.LOG_DIR, self.name)

@@ -1,6 +1,14 @@
 import os
+import logging
 
 import zmq
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 
 PUB_SERVER_PORT = os.environ.get('PUB_SERVER_PORT', 5556)
 REP_SERVER_PORT = os.environ.get('REP_SERVER_PORT', 5575)
@@ -8,7 +16,7 @@ REP_SERVER_PORT = os.environ.get('REP_SERVER_PORT', 5575)
 
 def start_server():
     context = zmq.Context()
-    print 'Messaging Server starting............ .'
+    logging.info('Messaging Server starting............ .')
 
     # Binding publisher server side
     pub = context.socket(zmq.PUB)
@@ -25,7 +33,7 @@ def start_server():
         # Replier answer
         rep.send('recived')
 
-        print 'Sending message, {}'.format(message)
+        logging.info('Sending message, {}'.format(message))
 
         # Pass message to all clients
         pub.send(message)

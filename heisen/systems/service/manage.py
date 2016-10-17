@@ -6,10 +6,11 @@ from heisen.systems.service.supervisor import supervisor
 def create_config():
     utils.check_user()
     utils.change_ownership()
+    virtual_env = utils.find_virtualenv()
 
     configs = [
         apps.UnixHttp(), apps.InetHttp(), apps.Group(),
-        apps.ZMQ(), apps.WatchDog(), apps.Heisen()
+        apps.ZMQ(virtual_env), apps.WatchDog(virtual_env), apps.Heisen(virtual_env)
     ]
 
     for app in configs:

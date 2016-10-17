@@ -1,6 +1,5 @@
 import abc
 import os
-from os.path import join, exists
 import ConfigParser
 
 from heisen.config import settings
@@ -50,8 +49,8 @@ class Application(BaseConfig):
     numprocs = 1
     numprocs_start = 1
 
-    def __init__(self):
-        self.environment = self.get_environment()
+    def __init__(self, virtualenv_dir):
+        self.environment = self.get_environment(virtualenv_dir)
         self.stdout_logfile = self.log_path()
 
         self._section_name = 'program:{}'.format(self.name)
@@ -59,54 +58,14 @@ class Application(BaseConfig):
             self._section_name.replace('program:', '')
         )
 
-    def get_environment(self):
+    def get_environment(self, virtualenv_dir=None):
         environment = 'INSTANCE_NUMBER="%(process_num)s"'
 
-        path = None
-        for method in [
-                self._virtualenv_specified,
-                self._virtualenv_wrapper,
-                self._virtualenv_parent
-        ]:
-            path = method()
-            if path:
-                break
-
-        if path:
-            environment += ',PATH="{}"'.format(path)
+        if virtualenv_dir:
+            environment += ',PATH="{}"'.format(virtualenv_dir)
+            print('Using {} as virtualenv directory'.format(virtualenv_dir))
 
         return environment
-
-    def _is_virtualenv(self, path):
-        virtualenv_dirs = ['bin', 'include', 'lib', 'local']
-        is_virtualenv = all([
-            exists(join(path, dir_name)) for dir_name in virtualenv_dirs
-        ])
-
-        if is_virtualenv:
-            return join(path, 'bin')
-
-    def _virtualenv_specified(self):
-        if not getattr(settings, 'VIRTUALENV_DIR', None):
-            return
-
-        return self._is_virtualenv(settings.VIRTUALENV_DIR)
-
-    def _virtualenv_wrapper(self):
-        if not (
-                os.environ.get('WORKON_HOME', None) and
-                getattr(settings, 'WORKON_NAME', None)
-        ):
-            return
-
-        virtualenv_dir = join(os.environ['WORKON_HOME'], settings.WORKON_NAME)
-        return self._is_virtualenv(virtualenv_dir)
-
-    def _virtualenv_parent(self):
-        base_dir = getattr(settings, 'BASE_DIR', 'HEISEN_BASE_DIR')
-        parent_dir = base_dir.rstrip('/').rpartition('/')[0]
-
-        return self._is_virtualenv(parent_dir)
 
 
 class UnixHttp(BaseConfig):

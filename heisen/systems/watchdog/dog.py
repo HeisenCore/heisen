@@ -1,6 +1,5 @@
 import os
 import traceback
-import xmlrpclib
 from multiprocessing import Process
 
 from watchdog.observers import Observer
@@ -9,7 +8,7 @@ from watchdog import events
 from heisen.core import rpc_call
 from heisen.config import settings
 
-from heapq.systems.service.supervisor import supervisor
+from heisen.systems.service.supervisor import supervisor
 
 
 class HeisenEventHandler(events.RegexMatchingEventHandler):
@@ -18,12 +17,15 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         super(HeisenEventHandler, self).__init__(*args, **kwargs)
 
     def on_deleted(self, event):
+        print 'Detected remove file event, restarting services'
         self.restart()
 
     def on_created(self, event):
+        print 'Detected create file event, restarting services'
         self.restart()
 
     def on_modified(self, event):
+        print 'Detected modify file event, restarting services'
         self.restart()
 
         # TODO: reload all instances of app
@@ -44,11 +46,11 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
 
         try:
             rpc_call.self.reload(path)
-        except Exception as e:
+        except Exception:
             traceback.print_exception()
 
     def restart(self):
-        supervisor.restart_heisen()
+        supervisor.restart()
 
 
 def monitor(directory):

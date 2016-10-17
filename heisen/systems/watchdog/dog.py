@@ -1,5 +1,7 @@
 import os
+import logging
 import traceback
+import datetime
 from multiprocessing import Process
 
 from watchdog.observers import Observer
@@ -10,23 +12,28 @@ from heisen.config import settings
 
 from heisen.systems.service.supervisor import supervisor
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 
 class HeisenEventHandler(events.RegexMatchingEventHandler):
     def __init__(self, *args, **kwargs):
         self.base_dir = kwargs.pop('base_dir', None)
+        self.restart_delay = datetime.timedelta(seconds=10)
+        self.last_restart = datetime.datetime.now()
         super(HeisenEventHandler, self).__init__(*args, **kwargs)
 
     def on_deleted(self, event):
-        print 'Detected remove file event, restarting services'
-        self.restart()
+        self.restart(event.src_path, 'deleted')
 
     def on_created(self, event):
-        print 'Detected create file event, restarting services'
-        self.restart()
+        self.restart(event.src_path, 'created')
 
     def on_modified(self, event):
-        print 'Detected modify file event, restarting services'
-        self.restart()
+        self.restart(event.src_path, 'modified')
 
         # TODO: reload all instances of app
         # if 'rpc' in event.src_path:
@@ -41,16 +48,25 @@ class HeisenEventHandler(events.RegexMatchingEventHandler):
         if 'rpc' not in path:
             return
 
-        if '#' in path:
-            return
-
         try:
             rpc_call.self.reload(path)
         except Exception:
             traceback.print_exception()
 
-    def restart(self):
+    def restart(self, path, mode):
+        if '#' in path:
+            return
+
+        if (datetime.datetime.now() - self.restart_delay) < self.last_restart:
+            logger.info('Ignoring restart event')
+            return
+
+        logger.info('{} file {}, restarting services'.format(
+            mode.capitalize(), path
+        ))
+
         supervisor.restart()
+        self.last_restart = datetime.datetime.now()
 
 
 def monitor(directory):
@@ -79,6 +95,7 @@ def monitor_app():
 
 if __name__ == '__main__':
     if settings.DEBUG:
+        logger.info('Started monitoring directories')
         p = Process(name='heisen_monitor', target=monitor_heisen)
         p.start()
 

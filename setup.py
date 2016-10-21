@@ -10,25 +10,26 @@ with open('HISTORY.rst') as history_file:
 
 # install_reqs = parse_requirements('requirements.txt', session=False)
 
-requirements = [
-    'pymongo==3.0.3',
-    'Jinja2==2.8',
-    'simplejson==3.8.2',
-    'zope.interface==4.0.5',
-    'apscheduler==3.2.0',
-    'Cerberus==1.0.1',
-    'cliff==2.1.0',
-    'component==0.0.1',
-    'docutils==0.12',
-    'import_string==0.1.0',
-    'pjson==1.0',
-    'pytz==2016.6.1',
+core_requirements = [           # heisen can't start without these
     'Twisted',
     'txJSON_RPC_heisen==0.4.5',
     'jsonrpclib_heisen<=0.1.14',
-    'cython==0.24.1',
-    'watchdog==0.8.3',
+    'cliff==2.1.0',
+    'zope.interface==4.0.5',
 ]
+
+optional_requirements = [       # heisen must function without these
+    'pymongo==3.0.3',
+    'import_string==0.1.0',
+    'Cerberus==1.0.1',
+    'apscheduler==3.2.0',
+    'Jinja2==2.8',
+    'watchdog==0.8.3',
+    'docutils==0.12',
+    # 'cython==0.24.1',
+]
+
+requirements = core_requirements + optional_requirements
 
 test_requirements = [
     # TODO: put package test requirements here

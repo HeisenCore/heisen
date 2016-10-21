@@ -1,5 +1,4 @@
 from heisen.config import settings
-from heisen.core.log import logger
 from jsonrpclib.request import ConnectionPool
 
 
@@ -9,7 +8,11 @@ def get_rpc_connection():
     else:
         username = passowrd = None
 
-    servers = {'self': [('localhost', settings.RPC_PORT, username, passowrd)]}
+    servers = {'self': []}
+    for instance_number in range(settings.INSTANCE_COUNT):
+        servers['self'].append((
+            'localhost', settings.RPC_PORT + instance_number, username, passowrd
+        ))
 
     servers.update(getattr(settings, 'RPC_SERVERS', {}))
     return ConnectionPool(servers, 'heisen', settings.APP_NAME)

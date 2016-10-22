@@ -40,7 +40,7 @@ class BaseConfig(object):
 class Application(BaseConfig):
     __metaclass__ = abc.ABCMeta
 
-    user = os.environ['USER']
+    user = os.environ.get('USER', None)
     startretries = 100
     stopasgroup = True
     autorestart = True
@@ -64,7 +64,7 @@ class Application(BaseConfig):
 class UnixHttp(BaseConfig):
     name = 'unix_http_server'
     chmod = '0770'
-    chown = '{}:{}'.format(os.environ['USER'], os.environ['USER'])
+    chown = '{}:{}'.format(os.environ.get('USER', None), os.environ.get('USER', None))
 
     def __init__(self):
         self._section_name = self.name

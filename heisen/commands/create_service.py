@@ -1,7 +1,5 @@
 from cliff.command import Command as CliffCommand
 
-from heisen.core.log import logger
-
 from heisen.systems.service import manage
 
 

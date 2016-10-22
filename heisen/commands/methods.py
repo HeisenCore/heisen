@@ -2,7 +2,6 @@ from pprint import pprint
 
 from cliff.command import Command as CliffCommand
 
-from heisen.core.log import logger
 from heisen.core import rpc_call
 
 

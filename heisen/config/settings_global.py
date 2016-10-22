@@ -96,6 +96,8 @@ DATABASES = {
 EMAIL_BACKEND = 'debug'
 EMAIL_TEMPLATE_DIR = os.path.join(HEISEN_BASE_DIR, '/templates')
 
+SOCKET_TIMEOUT = 2
+
 ZMQ = {
     'HOST': '127.0.0.1',
     'PUB': 5556,

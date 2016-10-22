@@ -1,11 +1,11 @@
 import sys
 import os
 import io
+import socket
 
 from twisted.internet import reactor
 from twisted.web import server
 from twisted.logger import Logger, textFileLogObserver
-from twisted.cred.checkers import FilePasswordDB
 from txjsonrpc.auth import wrapResource
 
 from heisen.config import settings
@@ -16,6 +16,7 @@ from heisen.rpc.auth import BasicCredChecker
 def start_service():
     print('{} Services Started'.format(settings.APP_NAME.capitalize()))
     sys.excepthook = excepthook
+    socket.setdefaulttimeout(settings.SOCKET_TIMEOUT)
     start_reactor()
 
 
@@ -39,5 +40,5 @@ def start_reactor():
 
 def excepthook(_type, value, traceback):
     import traceback
-    print 'Printing exception via excepthook'
+    print('Printing exception via excepthook')
     traceback.print_exception(_type, value, traceback)

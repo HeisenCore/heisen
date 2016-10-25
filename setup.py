@@ -20,6 +20,7 @@ core_requirements = [           # heisen can't start without these
 
 optional_requirements = [       # heisen must function without these
     'pymongo==3.0.3',
+    'pytz==2016.6.1',
     'import_string==0.1.0',
     'Cerberus==1.0.1',
     'apscheduler==3.2.0',

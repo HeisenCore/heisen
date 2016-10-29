@@ -2,7 +2,10 @@
 import os
 import logging
 
+import pytz
 
+
+LOCAL_TZ = pytz.timezone('Asia/Tehran')
 HEISEN_BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 RPC_PORT = 7089
 APP_NAME = 'heisen'

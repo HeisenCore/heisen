@@ -117,6 +117,11 @@ class Logger(object):
         except Exception as e:
             pass
 
+        formatter = FormatterWithContextForException(
+            self.formats.get(logger_format, 'basic'),
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+
         try:
             handler = logging.handlers.RotatingFileHandler(
                 join(log_dir, logger_name + '.log'),
@@ -129,12 +134,20 @@ class Logger(object):
             print '*********** Could not log to specified location, using StreamHandler ***********'
             handler = logging.StreamHandler()
 
-        formatter = FormatterWithContextForException(
-            self.formats.get(logger_format, 'basic'),
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
+        try:
+            import graypy
+
+            graylog_config = getattr(settings, 'GRAYLOG', {})
+            handler = graypy.GELFHandler(**graylog_config)
+
+            logger.addHandler(handler)
+        except ImportError:
+            warnings.warn('Could not find graypy')
+        else:
+            print 'Send logs data to ', graylog_config['host']
 
         logger.propagate = False
         filter = FilterWithAbsoluteModuleName()

@@ -19,15 +19,6 @@ class FormatterWithContextForException(logging.Formatter):
         return format_exception()
 
 
-class FilterWithAbsoluteModuleName(logging.Filter):
-    def filter(self, record):
-        absoluteModuleName = record.pathname.replace('.py', '', 1).replace(settings.HEISEN_BASE_DIR, '', 1).replace('/', '.').lstrip('.')
-
-        record.absoluteModuleName = absoluteModuleName
-
-        return True
-
-
 def format_exception(exc_info=None):
     """
         create and return text of last exception
@@ -143,10 +134,6 @@ class Logger(object):
 
             graylog_config = getattr(settings, 'GRAYLOG', {})
             handler = graypy.GELFHandler(**graylog_config)
-
-            handler.addFilter(filters.ProjectName())
-            handler.addFilter(filters.ExceptionHandler())
-
             logger.addHandler(handler)
         except ImportError:
             warnings.warn('Could not find graypy')
@@ -154,8 +141,9 @@ class Logger(object):
             print 'Send logs data to ', graylog_config['host']
 
         logger.propagate = False
-        filter = FilterWithAbsoluteModuleName()
-        logger.addFilter(filter)
+        logger.addFilter(filters.ProjectName())
+        logger.addFilter(filters.ExceptionHandler())
+        logger.addFilter(filters.AbsoluteModuleName())
 
         if logger_name == 'py.warnings':
             logging.captureWarnings(True)

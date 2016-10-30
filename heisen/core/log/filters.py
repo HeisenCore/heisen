@@ -28,3 +28,12 @@ class ExceptionHandler(logging.Filter):
             record.exception_line = traceback_obj.lineno
 
         return True
+
+
+class AbsoluteModuleName(logging.Filter):
+    def filter(self, record):
+        absoluteModuleName = record.pathname.replace('.py', '', 1).replace(settings.HEISEN_BASE_DIR, '', 1).replace('/', '.').lstrip('.')
+
+        record.absoluteModuleName = absoluteModuleName
+
+        return True

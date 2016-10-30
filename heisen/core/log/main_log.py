@@ -11,6 +11,7 @@ import warnings
 from functools import partial
 
 from heisen.config import settings
+from heisen.core.log import filters
 
 
 class FormatterWithContextForException(logging.Formatter):
@@ -142,6 +143,9 @@ class Logger(object):
 
             graylog_config = getattr(settings, 'GRAYLOG', {})
             handler = graypy.GELFHandler(**graylog_config)
+
+            handler.addFilter(filters.ProjectName())
+            handler.addFilter(filters.ExceptionHandler())
 
             logger.addHandler(handler)
         except ImportError:

@@ -34,6 +34,10 @@ LOG_DIR = '/var/log/heisen/'
 LOG_MAX_BYTES = 1000000
 LOG_BACKUP_COUNT = 10
 LOG_REQUEST = True
+LOG_FORMATS = {
+    'basic': '%(asctime)s - %(message)s',
+    'complete': '%(asctime)s - %(absolute_module_name)s.%(funcName)s:%(lineno)d - %(message)s'
+}
 LOGGERS = {
     'error': {
         'format': 'complete',

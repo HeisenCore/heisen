@@ -18,16 +18,16 @@ class Logger(object):
             print('*** No loggers found ***')
             return
 
-        self.formatter = logging.Formatter(
-            settings.LOG_FORMATS.get(logger_format, 'basic'),
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
         self.log_dir = self._log_dir()
 
         for logger_name, logger_config in settings.LOGGERS.items():
+            formatter = logging.Formatter(
+                settings.LOG_FORMATS.get(logger_config['format'], 'basic'),
+                datefmt='%Y-%m-%d %H:%M:%S'
+            )
             logger = self.setup(
                 logger_name,
-                logger_config['format'],
+                formatter,
                 logger_config['level'],
             )
             setattr(self, logger_name, partial(logger.info))
@@ -36,7 +36,7 @@ class Logger(object):
                 '--- Starting {} Logs ---'.format(logger_name.capitalize())
             )
 
-            external.graylog(logger_name, logger, self.formatter)
+            external.graylog(logger_name, logger, formatter)
 
     def _log_dir(self):
         log_dir = join(

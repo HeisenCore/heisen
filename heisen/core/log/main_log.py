@@ -81,7 +81,7 @@ class Logger(object):
             print '*********** Could not log to specified location, using StreamHandler ***********'
             handler = logging.StreamHandler()
 
-        handler.setFormatter(self.formatter)
+        handler.setFormatter(logger_format)
         logger.addHandler(handler)
 
         logger.propagate = False

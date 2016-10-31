@@ -97,7 +97,7 @@ class Main(JSONRPC):
 
         message = 'Reloaded {}'.format(full_name)
         logger.service(message)
-        print message
+        print(message)
 
     def _ebRender(self, failure, id):
         try:
@@ -107,7 +107,7 @@ class Main(JSONRPC):
             message = failure.value.message
             code = self._map_exception(type(failure.value))
 
-            logger._rpc_exception((
+            logger.rpc_exception((
                 failure.type, failure.value, failure.tb,
                 failure.getTraceback()
             ))

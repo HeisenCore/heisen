@@ -38,6 +38,7 @@ LOG_FORMATS = {
     'basic': '%(asctime)s - %(message)s',
     'complete': '%(asctime)s - %(absolute_module_name)s.%(funcName)s:%(lineno)d - %(message)s'
 }
+
 LOGGERS = {
     'error': {
         'format': 'complete',
@@ -88,6 +89,7 @@ LOGGERS = {
         'level': logging.DEBUG
     },
 }
+EXTERNAL_LOGGERS = ['error', 'request', 'twisted']
 
 DATABASES = {
     'default': {

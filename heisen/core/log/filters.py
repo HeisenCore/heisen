@@ -3,9 +3,11 @@ import logging
 from heisen.config import settings
 
 
-class ProjectName(logging.Filter):
+class ExtraFields(logging.Filter):
     def filter(self, record):
-        record.project = settings.APP_NAME
+        for key, value in getattr(settings, 'EXTERNAL_FIELDS', {}).items():
+            setattr(record, key, value)
+
         return True
 
 

@@ -90,6 +90,7 @@ LOGGERS = {
     },
 }
 EXTERNAL_LOGGERS = ['error', 'request', 'twisted']
+EXTERNAL_FIELDS = {}
 
 DATABASES = {
     'default': {

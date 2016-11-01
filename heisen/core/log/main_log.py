@@ -32,9 +32,7 @@ class Logger(object):
             )
             setattr(self, logger_name, partial(logger.info))
 
-            getattr(self, logger_name)(
-                '--- Starting {} Logs ---'.format(logger_name.capitalize())
-            )
+            getattr(self, logger_name)('--- Starting {} Logs ---'.format(logger_name.capitalize()))
 
             external.graylog(logger_name, logger, formatter)
 
@@ -85,7 +83,7 @@ class Logger(object):
         logger.addHandler(handler)
 
         logger.propagate = False
-        logger.addFilter(filters.ProjectName())
+        logger.addFilter(filters.ExtraFields())
         logger.addFilter(filters.AbsoluteModuleName())
 
         if logger_name == 'py.warnings':

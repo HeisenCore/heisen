@@ -42,13 +42,20 @@ def get_locals(tback):
 
 
 def get_info(value, tback):
-    traceback_obj = inspect.getframeinfo(tback)
     exception = value
-
-    return {
+    info = {
         'exception_type': exception.__class__.__name__,
         'exception_message': str(exception),
-        'exception_filename': traceback_obj.filename,
-        'exception_function': traceback_obj.function,
-        'exception_line': traceback_obj.lineno,
     }
+
+    try:
+        traceback_obj = inspect.getframeinfo(tback)
+        info.update({
+            'exception_filename': traceback_obj.filename,
+            'exception_function': traceback_obj.function,
+            'exception_line': traceback_obj.lineno,
+        })
+    except:
+        pass
+
+    return info

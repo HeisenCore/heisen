@@ -107,8 +107,10 @@ class Main(JSONRPC):
             message = failure.value.message
             code = self._map_exception(type(failure.value))
 
+            tb = failure.tb if failure.tb else failure.getTracebackObject()
+
             logger.rpc_exception((
-                failure.type, failure.value, failure.tb,
+                failure.type, failure.value, tb,
                 failure.getTraceback()
             ))
 

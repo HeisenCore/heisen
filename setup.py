@@ -27,6 +27,7 @@ optional_requirements = [       # heisen must function without these
     'Jinja2==2.8',
     'watchdog==0.8.3',
     'docutils==0.12',
+    'elasticsearch==5.0.1',
     # 'cython==0.24.1',
 ]
 

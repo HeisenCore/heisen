@@ -103,6 +103,9 @@ DATABASES = {
     },
 }
 
+ELASTICSEARCH_CONNECTIONS = ['http://localhost:9200/']
+ELASTICSEARCH_CONFIGS = {}
+
 EMAIL_BACKEND = 'debug'
 EMAIL_TEMPLATE_DIR = os.path.join(HEISEN_BASE_DIR, '/templates')
 

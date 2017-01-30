@@ -9,6 +9,10 @@ def graylog(name, logger, formatter):
             return
 
         graylog_config = getattr(settings, 'GRAYLOG', {})
+
+        if not graylog_config:
+            return
+
         handler = graypy.GELFHandler(**graylog_config)
 
         handler.setFormatter(formatter)

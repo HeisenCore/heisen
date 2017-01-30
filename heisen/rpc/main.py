@@ -1,6 +1,7 @@
 import inspect
 from pprint import pformat
 import os
+
 from txjsonrpc.web.jsonrpc import JSONRPC
 from txjsonrpc import jsonrpclib
 
@@ -11,7 +12,6 @@ from heisen.utils.module import load_module
 
 
 class Main(JSONRPC):
-
     def __init__(self):
         JSONRPC.__init__(self)
         self.logger = logger

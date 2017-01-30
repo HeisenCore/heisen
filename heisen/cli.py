@@ -55,6 +55,9 @@ def get_commands(path, manager):
         if not command_file.endswith('.py'):
             continue
 
+        if command_file.startswith('__init__'):
+            continue
+
         command_name = command_file.replace('.py', '')
         command = load_module(command_name, command_dir)
 
